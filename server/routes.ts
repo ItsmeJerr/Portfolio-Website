@@ -402,7 +402,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const message = await storage.createContactMessage(messageData);
 
       // Kirim response ke client SEBELUM proses email
-      res.json(message);
+      res.json({
+        success: true,
+        message: "Pesan berhasil dikirim!",
+        data: message,
+      });
 
       // Proses email di background (tidak mempengaruhi response)
       sendContactEmail(messageData)
@@ -418,7 +422,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         );
     } catch (error) {
       console.error("Error dalam contact-messages:", error);
-      res.status(400).json({ message: "Invalid message data" });
+      res
+        .status(400)
+        .json({ message: "Gagal mengirim pesan", error: error.message });
     }
   });
 
