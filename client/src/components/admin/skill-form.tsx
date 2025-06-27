@@ -1,16 +1,31 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { insertSkillSchema, type Skill, type InsertSkill } from "@shared/schema";
+import {
+  insertSkillSchema,
+  type Skill,
+  type InsertSkill,
+} from "@shared/schema";
 import { skillCategories } from "@/lib/types";
 
 interface SkillFormProps {
@@ -31,17 +46,19 @@ export function SkillForm({ skill, isOpen, onClose }: SkillFormProps) {
     formState: { errors },
   } = useForm<InsertSkill>({
     resolver: zodResolver(insertSkillSchema),
-    defaultValues: skill ? {
-      name: skill.name,
-      category: skill.category,
-      proficiency: skill.proficiency,
-      description: skill.description || "",
-    } : {
-      name: "",
-      category: "Frontend Development",
-      proficiency: 50,
-      description: "",
-    },
+    defaultValues: skill
+      ? {
+          name: skill.name,
+          category: skill.category,
+          proficiency: skill.proficiency,
+          description: skill.description || "",
+        }
+      : {
+          name: "",
+          category: "Frontend Development",
+          proficiency: 50,
+          description: "",
+        },
   });
 
   const proficiency = watch("proficiency");
@@ -51,20 +68,34 @@ export function SkillForm({ skill, isOpen, onClose }: SkillFormProps) {
       const url = skill ? `/api/skills/${skill.id}` : "/api/skills";
       const method = skill ? "PUT" : "POST";
       const response = await apiRequest(method, url, data);
-      return response.json();
+      if (!response.ok) {
+        const errorData = await response
+          .text()
+          .then((t) => (t ? JSON.parse(t) : {}))
+          .catch(() => ({}));
+        throw new Error(
+          errorData.message || `Failed to ${skill ? "update" : "create"} skill`
+        );
+      }
+      const text = await response.text();
+      return text ? JSON.parse(text) : {};
     },
     onSuccess: () => {
       toast({
         title: skill ? "Skill Updated" : "Skill Created",
-        description: `Skill has been ${skill ? "updated" : "created"} successfully.`,
+        description: `Skill has been ${
+          skill ? "updated" : "created"
+        } successfully.`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/skills"] });
       onClose();
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: `Failed to ${skill ? "update" : "create"} skill. Please try again.`,
+        description:
+          error?.message ||
+          `Failed to ${skill ? "update" : "create"} skill. Please try again.`,
         variant: "destructive",
       });
     },
@@ -83,13 +114,11 @@ export function SkillForm({ skill, isOpen, onClose }: SkillFormProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <Label htmlFor="name">Skill Name</Label>
-            <Input
-              id="name"
-              {...register("name")}
-              className="mt-2"
-            />
+            <Input id="name" {...register("name")} className="mt-2" />
             {errors.name && (
-              <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
+              <p className="text-sm text-destructive mt-1">
+                {errors.name.message}
+              </p>
             )}
           </div>
 
@@ -111,7 +140,9 @@ export function SkillForm({ skill, isOpen, onClose }: SkillFormProps) {
               </SelectContent>
             </Select>
             {errors.category && (
-              <p className="text-sm text-destructive mt-1">{errors.category.message}</p>
+              <p className="text-sm text-destructive mt-1">
+                {errors.category.message}
+              </p>
             )}
           </div>
 
@@ -124,7 +155,9 @@ export function SkillForm({ skill, isOpen, onClose }: SkillFormProps) {
               className="mt-2 resize-none"
             />
             {errors.description && (
-              <p className="text-sm text-destructive mt-1">{errors.description.message}</p>
+              <p className="text-sm text-destructive mt-1">
+                {errors.description.message}
+              </p>
             )}
           </div>
 
@@ -140,7 +173,9 @@ export function SkillForm({ skill, isOpen, onClose }: SkillFormProps) {
               />
             </div>
             {errors.proficiency && (
-              <p className="text-sm text-destructive mt-1">{errors.proficiency.message}</p>
+              <p className="text-sm text-destructive mt-1">
+                {errors.proficiency.message}
+              </p>
             )}
           </div>
 
@@ -148,8 +183,8 @@ export function SkillForm({ skill, isOpen, onClose }: SkillFormProps) {
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={skillMutation.isPending}
               className="bg-primary hover:bg-primary/90"
             >
@@ -160,8 +195,10 @@ export function SkillForm({ skill, isOpen, onClose }: SkillFormProps) {
                   <div></div>
                   <div></div>
                 </div>
+              ) : skill ? (
+                "Update Skill"
               ) : (
-                skill ? "Update Skill" : "Add Skill"
+                "Add Skill"
               )}
             </Button>
           </div>

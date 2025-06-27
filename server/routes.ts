@@ -1,11 +1,43 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { 
-  insertProfileSchema, insertSkillSchema, insertExperienceSchema, 
-  insertEducationSchema, insertCertificationSchema, insertActivitySchema, 
-  insertArticleSchema, insertContactMessageSchema 
+import { sendContactEmail, sendAutoReply } from "./email";
+import {
+  insertProfileSchema,
+  insertSkillSchema,
+  insertExperienceSchema,
+  insertEducationSchema,
+  insertCertificationSchema,
+  insertActivitySchema,
+  insertArticleSchema,
+  insertContactMessageSchema,
 } from "@shared/schema";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+// Setup multer
+const uploadDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+const storageMulter = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+      cb(null, name);
+    },
+  }),
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) cb(null, true);
+    else cb(new Error("Only image files are allowed!"));
+  },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Profile routes
@@ -83,6 +115,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const experiences = await storage.getExperiences();
       res.json(experiences);
     } catch (error) {
+      console.error("Error GET /api/experiences:", error);
       res.status(500).json({ message: "Failed to fetch experiences" });
     }
   });
@@ -188,7 +221,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/certifications", async (req, res) => {
     try {
       const certificationData = insertCertificationSchema.parse(req.body);
-      const certification = await storage.createCertification(certificationData);
+      const certification = await storage.createCertification(
+        certificationData
+      );
       res.json(certification);
     } catch (error) {
       res.status(400).json({ message: "Invalid certification data" });
@@ -198,8 +233,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/certifications/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const certificationData = insertCertificationSchema.partial().parse(req.body);
-      const certification = await storage.updateCertification(id, certificationData);
+      const certificationData = insertCertificationSchema
+        .partial()
+        .parse(req.body);
+      const certification = await storage.updateCertification(
+        id,
+        certificationData
+      );
       if (certification) {
         res.json(certification);
       } else {
@@ -276,9 +316,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Articles routes
   app.get("/api/articles", async (req, res) => {
     try {
-      const published = req.query.published === 'true';
-      const featured = req.query.featured === 'true';
-      
+      const published = req.query.published === "true";
+      const featured = req.query.featured === "true";
+
       let articles;
       if (featured) {
         articles = await storage.getFeaturedArticles();
@@ -287,7 +327,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         articles = await storage.getArticles();
       }
-      
+
       res.json(articles);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch articles" });
@@ -360,8 +400,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const messageData = insertContactMessageSchema.parse(req.body);
       const message = await storage.createContactMessage(messageData);
+
+      // Kirim response ke client SEBELUM proses email
       res.json(message);
+
+      // Proses email di background (tidak mempengaruhi response)
+      sendContactEmail(messageData)
+        .then(() => console.log("Email contact berhasil dikirim"))
+        .catch((emailError) =>
+          console.error("Error mengirim email contact:", emailError)
+        );
+
+      sendAutoReply(messageData.email, messageData.firstName)
+        .then(() => console.log("Auto-reply berhasil dikirim"))
+        .catch((autoReplyError) =>
+          console.error("Error mengirim auto-reply:", autoReplyError)
+        );
     } catch (error) {
+      console.error("Error dalam contact-messages:", error);
       res.status(400).json({ message: "Invalid message data" });
     }
   });
@@ -394,6 +450,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint upload gambar
+  app.post("/api/upload-image", storageMulter.single("image"), (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+    const fileUrl = `/uploads/${req.file.filename}`;
+    res.json({ url: fileUrl });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
+}
+
+// Serve static uploads
+import express from "express";
+export function serveUploads(app: Express) {
+  app.use("/uploads", express.static(uploadDir));
 }

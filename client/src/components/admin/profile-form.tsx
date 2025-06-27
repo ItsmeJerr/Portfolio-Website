@@ -8,7 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { insertProfileSchema, type Profile, type InsertProfile } from "@shared/schema";
+import {
+  insertProfileSchema,
+  type Profile,
+  type InsertProfile,
+} from "@shared/schema";
+import { useRef, useState } from "react";
 
 interface ProfileFormProps {
   profile?: Profile;
@@ -18,6 +23,9 @@ interface ProfileFormProps {
 export function ProfileForm({ profile, isLoading }: ProfileFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [imageUrl, setImageUrl] = useState(profile?.image || "");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -25,20 +33,22 @@ export function ProfileForm({ profile, isLoading }: ProfileFormProps) {
     formState: { errors },
   } = useForm<InsertProfile>({
     resolver: zodResolver(insertProfileSchema),
-    defaultValues: profile ? {
-      fullName: profile.fullName,
-      position: profile.position,
-      email: profile.email,
-      phone: profile.phone || "",
-      location: profile.location || "",
-      bio: profile.bio || "",
-      age: profile.age || undefined,
-      linkedinUrl: profile.linkedinUrl || "",
-      githubUrl: profile.githubUrl || "",
-      twitterUrl: profile.twitterUrl || "",
-      instagramUrl: profile.instagramUrl || "",
-      youtubeUrl: profile.youtubeUrl || "",
-    } : undefined,
+    defaultValues: profile
+      ? {
+          fullName: profile.fullName,
+          position: profile.position,
+          email: profile.email,
+          phone: profile.phone || "",
+          location: profile.location || "",
+          bio: profile.bio || "",
+          age: profile.age || undefined,
+          linkedinUrl: profile.linkedinUrl || "",
+          githubUrl: profile.githubUrl || "",
+          twitterUrl: profile.twitterUrl || "",
+          instagramUrl: profile.instagramUrl || "",
+          youtubeUrl: profile.youtubeUrl || "",
+        }
+      : undefined,
   });
 
   const updateProfileMutation = useMutation({
@@ -62,8 +72,47 @@ export function ProfileForm({ profile, isLoading }: ProfileFormProps) {
     },
   });
 
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("image", file);
+    setUploading(true);
+    try {
+      const res = await fetch("/api/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        toast({
+          title: "Upload Gagal",
+          description: err.message || "Gagal upload gambar.",
+          variant: "destructive",
+        });
+        return;
+      }
+      const data = await res.json();
+      if (data.url) {
+        setImageUrl(data.url);
+        toast({
+          title: "Upload Berhasil",
+          description: "Gambar berhasil di-upload.",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Upload Gagal",
+        description: "Terjadi error saat upload gambar.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const onSubmit = (data: InsertProfile) => {
-    updateProfileMutation.mutate(data);
+    updateProfileMutation.mutate({ ...data, image: imageUrl });
   };
 
   if (isLoading) {
@@ -88,28 +137,57 @@ export function ProfileForm({ profile, isLoading }: ProfileFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Foto Profile */}
+      <div className="flex flex-col items-center gap-2">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt="Profile"
+            className="w-24 h-24 rounded-full object-cover border"
+          />
+        ) : (
+          <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center text-muted-foreground border">
+            No Photo
+          </div>
+        )}
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleImageChange}
+          className="hidden"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+        >
+          {uploading
+            ? "Uploading..."
+            : imageUrl
+            ? "Edit Photo"
+            : "Upload Photo"}
+        </Button>
+      </div>
       <div className="grid md:grid-cols-2 gap-6">
         <div>
           <Label htmlFor="fullName">Full Name</Label>
-          <Input
-            id="fullName"
-            {...register("fullName")}
-            className="mt-2"
-          />
+          <Input id="fullName" {...register("fullName")} className="mt-2" />
           {errors.fullName && (
-            <p className="text-sm text-destructive mt-1">{errors.fullName.message}</p>
+            <p className="text-sm text-destructive mt-1">
+              {errors.fullName.message}
+            </p>
           )}
         </div>
 
         <div>
           <Label htmlFor="position">Position</Label>
-          <Input
-            id="position"
-            {...register("position")}
-            className="mt-2"
-          />
+          <Input id="position" {...register("position")} className="mt-2" />
           {errors.position && (
-            <p className="text-sm text-destructive mt-1">{errors.position.message}</p>
+            <p className="text-sm text-destructive mt-1">
+              {errors.position.message}
+            </p>
           )}
         </div>
 
@@ -122,31 +200,29 @@ export function ProfileForm({ profile, isLoading }: ProfileFormProps) {
             className="mt-2"
           />
           {errors.email && (
-            <p className="text-sm text-destructive mt-1">{errors.email.message}</p>
+            <p className="text-sm text-destructive mt-1">
+              {errors.email.message}
+            </p>
           )}
         </div>
 
         <div>
           <Label htmlFor="phone">Phone</Label>
-          <Input
-            id="phone"
-            {...register("phone")}
-            className="mt-2"
-          />
+          <Input id="phone" {...register("phone")} className="mt-2" />
           {errors.phone && (
-            <p className="text-sm text-destructive mt-1">{errors.phone.message}</p>
+            <p className="text-sm text-destructive mt-1">
+              {errors.phone.message}
+            </p>
           )}
         </div>
 
         <div>
           <Label htmlFor="location">Location</Label>
-          <Input
-            id="location"
-            {...register("location")}
-            className="mt-2"
-          />
+          <Input id="location" {...register("location")} className="mt-2" />
           {errors.location && (
-            <p className="text-sm text-destructive mt-1">{errors.location.message}</p>
+            <p className="text-sm text-destructive mt-1">
+              {errors.location.message}
+            </p>
           )}
         </div>
 
@@ -159,7 +235,9 @@ export function ProfileForm({ profile, isLoading }: ProfileFormProps) {
             className="mt-2"
           />
           {errors.age && (
-            <p className="text-sm text-destructive mt-1">{errors.age.message}</p>
+            <p className="text-sm text-destructive mt-1">
+              {errors.age.message}
+            </p>
           )}
         </div>
       </div>
@@ -189,20 +267,12 @@ export function ProfileForm({ profile, isLoading }: ProfileFormProps) {
 
         <div>
           <Label htmlFor="githubUrl">GitHub URL</Label>
-          <Input
-            id="githubUrl"
-            {...register("githubUrl")}
-            className="mt-2"
-          />
+          <Input id="githubUrl" {...register("githubUrl")} className="mt-2" />
         </div>
 
         <div>
           <Label htmlFor="twitterUrl">Twitter URL</Label>
-          <Input
-            id="twitterUrl"
-            {...register("twitterUrl")}
-            className="mt-2"
-          />
+          <Input id="twitterUrl" {...register("twitterUrl")} className="mt-2" />
         </div>
 
         <div>
@@ -216,16 +286,12 @@ export function ProfileForm({ profile, isLoading }: ProfileFormProps) {
 
         <div>
           <Label htmlFor="youtubeUrl">YouTube URL</Label>
-          <Input
-            id="youtubeUrl"
-            {...register("youtubeUrl")}
-            className="mt-2"
-          />
+          <Input id="youtubeUrl" {...register("youtubeUrl")} className="mt-2" />
         </div>
       </div>
 
-      <Button 
-        type="submit" 
+      <Button
+        type="submit"
         disabled={updateProfileMutation.isPending}
         className="bg-primary hover:bg-primary/90"
       >

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Edit, Trash2 } from "lucide-react";
+import { EducationForm } from "./education-form";
 
 interface Column {
   key: string;

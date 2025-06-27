@@ -10,6 +10,10 @@ import Home from "@/pages/home";
 import Articles from "@/pages/articles";
 import Contact from "@/pages/contact";
 import Admin from "@/pages/admin";
+import AdminLogin from "./pages/admin-login";
+import { FlyingStarsBackground } from "@/components/ui/flying-stars-background";
+import { BackToTopButton } from "@/components/ui/back-to-top";
+import { Footer } from "@/components/ui/footer";
 
 function Router() {
   return (
@@ -18,6 +22,7 @@ function Router() {
       <Route path="/articles" component={Articles} />
       <Route path="/contact" component={Contact} />
       <Route path="/admin" component={Admin} />
+      <Route path="/admin-login" component={AdminLogin} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -26,17 +31,22 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light">
+      <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
-          <div className="min-h-screen bg-background text-foreground">
-            <Navigation />
-            <main className="pt-16">
-              <Router />
-            </main>
+          <div className="min-h-screen bg-background text-foreground relative">
+            <FlyingStarsBackground />
+            <div className="relative z-10">
+              <Navigation />
+              <main className="pt-16">
+                <Router />
+              </main>
+            </div>
           </div>
           <Toaster />
         </TooltipProvider>
       </ThemeProvider>
+      <BackToTopButton />
+      <Footer />
     </QueryClientProvider>
   );
 }

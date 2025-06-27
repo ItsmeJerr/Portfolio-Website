@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "@/components/theme-provider";
 import { Menu, Moon, Sun } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -27,19 +29,25 @@ export function Navigation() {
         <Link
           key={item.href}
           href={item.href}
-          className={`transition-colors duration-200 ${
-            mobile
-              ? "block px-3 py-2 rounded-md text-base font-medium hover:bg-accent hover:text-accent-foreground"
-              : "text-sm font-medium hover:text-primary"
-          } ${
-            location === item.href
-              ? mobile
-                ? "bg-accent text-accent-foreground"
-                : "text-primary"
-              : mobile
-              ? "text-muted-foreground"
-              : "text-muted-foreground"
-          }`}
+          className={cn(
+            `relative transition-colors duration-200
+            ${
+              mobile
+                ? "block px-3 py-2 rounded-md text-base font-medium hover:bg-accent hover:text-accent-foreground"
+                : "text-sm font-medium hover:text-primary"
+            }
+            ${
+              location === item.href
+                ? mobile
+                  ? "bg-accent text-accent-foreground"
+                  : "text-primary"
+                : mobile
+                ? "text-muted-foreground"
+                : "text-muted-foreground"
+            }
+            after:absolute after:left-0 after:-bottom-1 after:w-full after:h-0.5 after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left`,
+            "transition-transform duration-200 hover:scale-105 hover:underline hover:underline-offset-8 hover:decoration-primary"
+          )}
           onClick={mobile ? () => setIsOpen(false) : undefined}
         >
           {item.label}
@@ -54,7 +62,7 @@ export function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
-            <h1 className="text-xl font-bold text-primary">Portfolio</h1>
+            <Logo className="h-10" />
           </Link>
 
           {/* Desktop Navigation */}
