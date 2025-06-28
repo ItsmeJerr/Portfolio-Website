@@ -173,7 +173,7 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-foreground">Email</h3>
                     <p className="text-muted-foreground">
-                      {profile?.email || "john.doe@example.com"}
+                      {profile?.email || "mbintangal05@gmail.com"}
                     </p>
                   </div>
                 </div>
@@ -184,7 +184,7 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-foreground">Phone</h3>
                     <p className="text-muted-foreground">
-                      {profile?.phone || "+62 812-3456-7890"}
+                      {profile?.phone || "+62 895 1884 7188"}
                     </p>
                   </div>
                 </div>
@@ -195,7 +195,7 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-foreground">Location</h3>
                     <p className="text-muted-foreground">
-                      {profile?.location || "Jakarta, Indonesia"}
+                      {profile?.location || "Bekasi, Indonesia"}
                     </p>
                   </div>
                 </div>
