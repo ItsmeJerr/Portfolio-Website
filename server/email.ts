@@ -6,7 +6,7 @@ const isEmailConfigured = process.env.EMAIL_USER && process.env.EMAIL_PASS;
 
 // Email transporter configuration (only if configuration is available)
 const transporter = isEmailConfigured
-  ? nodemailer.createTransporter({
+  ? nodemailer.createTransport({
       service: "gmail", // Or other service you use
       auth: {
         user: process.env.EMAIL_USER, // Your email
