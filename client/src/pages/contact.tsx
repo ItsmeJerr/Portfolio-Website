@@ -237,7 +237,8 @@ export default function Contact() {
                 <div className="space-y-2">
                   <p className="text-3xl font-bold text-primary">$400</p>
                   <p className="text-muted-foreground text-sm">
-                    Professional portfolio website development service price.
+                    I turn ideas into websites clean, responsive, and uniquely
+                    yours.
                   </p>
                 </div>
               </div>
