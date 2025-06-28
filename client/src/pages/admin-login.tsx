@@ -14,7 +14,7 @@ export default function AdminLogin() {
       localStorage.setItem("admin_logged_in", "true");
       setLocation("/admin");
     } else {
-      setError("Username atau password salah!");
+      setError("Incorrect username or password!");
     }
   };
 

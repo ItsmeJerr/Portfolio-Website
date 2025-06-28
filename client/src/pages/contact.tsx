@@ -237,7 +237,7 @@ export default function Contact() {
                 <div className="space-y-2">
                   <p className="text-3xl font-bold text-primary">$400</p>
                   <p className="text-muted-foreground text-sm">
-                    Harga jasa pembuatan website portfolio profesional.
+                    Professional portfolio website development service price.
                   </p>
                 </div>
               </div>

@@ -127,15 +127,15 @@ export function EducationForm({
         setValue("image", data.url as any, { shouldValidate: true });
       } else {
         toast({
-          title: "Upload gagal",
-          description: data.message || "Gagal upload gambar",
+          title: "Upload failed",
+          description: data.message || "Failed to upload image",
           variant: "destructive",
         });
       }
     } catch (err) {
       toast({
-        title: "Upload gagal",
-        description: "Gagal upload gambar",
+        title: "Upload failed",
+        description: "Failed to upload image",
         variant: "destructive",
       });
     } finally {
@@ -152,7 +152,7 @@ export function EducationForm({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Upload & Preview Gambar */}
+          {/* Upload & Preview Image */}
           <div className="flex flex-col items-center gap-2">
             {imageUrl ? (
               <img

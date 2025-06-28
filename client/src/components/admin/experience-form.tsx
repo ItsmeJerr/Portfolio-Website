@@ -131,8 +131,8 @@ export function ExperienceForm({
         if (!res.ok) {
           const err = await res.json();
           toast({
-            title: "Upload Gagal",
-            description: err.message || "Gagal upload gambar.",
+            title: "Upload failed",
+            description: err.message || "Failed to upload image.",
             variant: "destructive",
           });
           continue;
@@ -143,14 +143,15 @@ export function ExperienceForm({
       setImages((prev) => [...prev, ...uploaded]);
       if (uploaded.length > 0) {
         toast({
-          title: "Upload Berhasil",
-          description: `${uploaded.length} gambar berhasil di-upload.`,
+          title: "Success",
+          description: `${uploaded.length} images uploaded successfully.`,
+          variant: "success",
         });
       }
     } catch (err) {
       toast({
-        title: "Upload Gagal",
-        description: "Terjadi error saat upload gambar.",
+        title: "Error",
+        description: "An error occurred while uploading the image.",
         variant: "destructive",
       });
     } finally {

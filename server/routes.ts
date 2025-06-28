@@ -401,30 +401,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const messageData = insertContactMessageSchema.parse(req.body);
       const message = await storage.createContactMessage(messageData);
 
-      // Kirim response ke client SEBELUM proses email
-      res.json({
+      // Send response to client BEFORE email processing
+      res.status(201).json({
         success: true,
-        message: "Pesan berhasil dikirim!",
+        message: "Message sent successfully!",
         data: message,
       });
 
-      // Proses email di background (tidak mempengaruhi response)
+      // Process email in background (doesn't affect response)
       sendContactEmail(messageData)
-        .then(() => console.log("Email contact berhasil dikirim"))
-        .catch((emailError) =>
-          console.error("Error mengirim email contact:", emailError)
-        );
+        .then(() => console.log("Contact email sent successfully"))
+        .catch((err) => console.error("Failed to send contact email:", err));
 
+      // Send auto-reply in background
       sendAutoReply(messageData.email, messageData.firstName)
-        .then(() => console.log("Auto-reply berhasil dikirim"))
-        .catch((autoReplyError) =>
-          console.error("Error mengirim auto-reply:", autoReplyError)
-        );
+        .then(() => console.log("Auto-reply sent successfully"))
+        .catch((err) => console.error("Failed to send auto-reply:", err));
     } catch (error) {
-      console.error("Error dalam contact-messages:", error);
+      console.error("Error POST /api/contact-messages:", error);
       res
         .status(400)
-        .json({ message: "Gagal mengirim pesan", error: error.message });
+        .json({ message: "Failed to send message", error: error.message });
     }
   });
 
@@ -456,7 +453,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Endpoint upload gambar
+  // Image upload endpoint
   app.post("/api/upload-image", storageMulter.single("image"), (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });

@@ -8,6 +8,7 @@ import { Navigation } from "@/components/navigation";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Articles from "@/pages/articles";
+import ArticleDetail from "@/pages/article-detail";
 import Contact from "@/pages/contact";
 import Admin from "@/pages/admin";
 import AdminLogin from "./pages/admin-login";
@@ -20,6 +21,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/articles" component={Articles} />
+      <Route path="/article" component={ArticleDetail} />
       <Route path="/contact" component={Contact} />
       <Route path="/admin" component={Admin} />
       <Route path="/admin-login" component={AdminLogin} />

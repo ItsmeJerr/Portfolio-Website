@@ -6,6 +6,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Clock, Calendar, ExternalLink } from "lucide-react";
 import type { Article } from "@shared/schema";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
+import { useState } from "react";
+import { Link, useLocation } from "wouter";
 
 function LoadingSkeleton() {
   return (
@@ -60,17 +62,27 @@ export default function Articles() {
   });
 
   const regularArticles = articles.filter((article) => !article.featured);
+  const [displayCount, setDisplayCount] = useState(6);
+  const [, setLocation] = useLocation();
+
+  const displayedArticles = regularArticles.slice(0, displayCount);
+  const hasMoreArticles = displayCount < regularArticles.length;
 
   const handleReadArticle = (article: Article) => {
-    if (article.url) {
+    if (article.url && article.url.startsWith("http")) {
       window.open(article.url, "_blank");
     } else {
-      // Jika tidak ada URL, bisa redirect ke halaman detail artikel internal
-      alert(`Artikel "${article.title}" akan segera tersedia!`);
+      setLocation(`/article?slug=${article.slug}`);
     }
   };
 
+  const handleLoadMore = () => {
+    setDisplayCount((prev) => prev + 6);
+  };
+
   const sectionReveal = useScrollReveal();
+
+  const [previewImg, setPreviewImg] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -93,6 +105,31 @@ export default function Articles() {
 
   return (
     <div className="pt-24 pb-12">
+      {/* Image Preview Modal */}
+      {previewImg && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          onClick={() => setPreviewImg(null)}
+        >
+          <div
+            className="relative max-w-2xl w-full flex justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute -top-4 -right-4 bg-white rounded-full shadow p-1 text-black hover:bg-gray-200 z-10"
+              onClick={() => setPreviewImg(null)}
+              aria-label="Close preview"
+            >
+              ×
+            </button>
+            <img
+              src={previewImg}
+              alt="Preview"
+              className="rounded-2xl max-h-[80vh] w-auto object-contain shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           className={`text-center mb-12 ${sectionReveal.className}`}
@@ -150,7 +187,8 @@ export default function Articles() {
                       <img
                         src={fa.imageUrl}
                         alt={fa.title}
-                        className="rounded-xl shadow-lg w-full h-auto transition-transform duration-300 group-hover:scale-110"
+                        className="rounded-xl shadow-lg w-full h-auto transition-transform duration-300 group-hover:scale-110 cursor-pointer"
+                        onClick={() => setPreviewImg(fa.imageUrl)}
                       />
                     )}
                   </div>
@@ -161,7 +199,7 @@ export default function Articles() {
         )}
         {/* Articles Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {regularArticles.map((article) => (
+          {displayedArticles.map((article) => (
             <Card
               key={article.id}
               className="overflow-hidden transition-transform duration-300 group hover:scale-105 hover:shadow-2xl"
@@ -171,7 +209,8 @@ export default function Articles() {
                   <img
                     src={article.imageUrl}
                     alt={article.title}
-                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110 cursor-pointer"
+                    onClick={() => setPreviewImg(article.imageUrl)}
                   />
                 )}
               </div>
@@ -187,6 +226,9 @@ export default function Articles() {
                 <h3 className="text-lg font-semibold text-foreground mb-2 line-clamp-2">
                   {article.title}
                 </h3>
+                <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
+                  {article.excerpt}
+                </p>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">
                     {article.readTime} min read
@@ -198,7 +240,9 @@ export default function Articles() {
                     onClick={() => handleReadArticle(article)}
                   >
                     <ExternalLink className="h-4 w-4 mr-1" />
-                    Read More
+                    {article.url && article.url.startsWith("http")
+                      ? "Read"
+                      : "Read More"}
                   </Button>
                 </div>
               </CardContent>
@@ -207,15 +251,26 @@ export default function Articles() {
         </div>
 
         {/* Load More Button */}
-        {articles.length > 0 && (
+        {hasMoreArticles && (
           <div className="text-center mt-12">
             <Button
               size="lg"
               className="bg-primary hover:bg-primary/90"
-              onClick={() => alert("Fitur Load More akan segera tersedia!")}
+              onClick={handleLoadMore}
             >
-              Load More Articles
+              Load More Articles ({regularArticles.length - displayCount}{" "}
+              remaining)
             </Button>
+          </div>
+        )}
+
+        {/* Show all loaded message */}
+        {!hasMoreArticles && regularArticles.length > 0 && (
+          <div className="text-center mt-12">
+            <p className="text-muted-foreground">
+              All articles have been displayed ({regularArticles.length}{" "}
+              articles)
+            </p>
           </div>
         )}
 
@@ -226,7 +281,7 @@ export default function Articles() {
               No Articles Yet
             </h3>
             <p className="text-muted-foreground">
-              Articles will appear here once they are published.
+              Articles will appear here once published.
             </p>
           </div>
         )}

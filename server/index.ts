@@ -40,7 +40,7 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
-  // Serve uploads folder secara publik
+  // Serve uploads folder publicly
   serveUploads(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -65,11 +65,11 @@ app.use((req, res, next) => {
   const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
   server.listen(
     {
-    port,
-    host: "0.0.0.0",
+      port,
+      host: "0.0.0.0",
     },
     () => {
-    log(`serving on port ${port}`);
+      log(`serving on port ${port}`);
     }
   );
 })();

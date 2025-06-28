@@ -142,11 +142,46 @@ export default function Admin() {
       const text = await response.text();
       return text ? JSON.parse(text) : {};
     },
+    onMutate: async ({ type, id }) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      const queryKey =
+        type === "message" ? ["/api/contact-messages"] : ["/api/" + type + "s"];
+      await queryClient.cancelQueries({ queryKey });
+
+      // Snapshot the previous value
+      const previousData = queryClient.getQueryData(queryKey);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(queryKey, (old: any[]) => {
+        return old ? old.filter((item: any) => item.id !== id) : [];
+      });
+
+      // For articles, also update published and featured queries
+      if (type === "article") {
+        queryClient.setQueryData(
+          ["/api/articles?published=true"],
+          (old: any[]) => {
+            return old ? old.filter((item: any) => item.id !== id) : [];
+          }
+        );
+        queryClient.setQueryData(
+          ["/api/articles?featured=true"],
+          (old: any[]) => {
+            return old ? old.filter((item: any) => item.id !== id) : [];
+          }
+        );
+      }
+
+      // Return a context object with the snapshotted value
+      return { previousData, type, queryKey };
+    },
     onSuccess: (_, { type }) => {
       toast({
         title: "Deleted Successfully",
         description: `${type} has been deleted.`,
       });
+
+      // Invalidate and refetch to ensure data consistency
       const queryKeys = {
         skill: ["/api/skills"],
         experience: ["/api/experiences"],
@@ -160,11 +195,29 @@ export default function Admin() {
         ],
         message: ["/api/contact-messages"],
       };
+
       (queryKeys[type as keyof typeof queryKeys] as string[]).forEach((key) => {
         queryClient.invalidateQueries({ queryKey: [key] });
       });
     },
-    onError: (error: any) => {
+    onError: (error: any, { type }, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      if (context?.previousData && context?.queryKey) {
+        queryClient.setQueryData(context.queryKey, context.previousData);
+
+        // For articles, also rollback published and featured queries
+        if (type === "article") {
+          queryClient.setQueryData(
+            ["/api/articles?published=true"],
+            context.previousData
+          );
+          queryClient.setQueryData(
+            ["/api/articles?featured=true"],
+            context.previousData
+          );
+        }
+      }
+
       let msg = error?.message;
       // Coba parse jika mengandung JSON
       const match = msg && msg.match(/\{.*\}/);
@@ -197,13 +250,65 @@ export default function Admin() {
         });
       }
     },
+    onSettled: (_, __, { type }, context) => {
+      // Always refetch after error or success to ensure data consistency
+      if (context?.queryKey) {
+        queryClient.invalidateQueries({ queryKey: context.queryKey });
+      }
+      if (type === "article") {
+        queryClient.invalidateQueries({
+          queryKey: ["/api/articles?published=true"],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["/api/articles?featured=true"],
+        });
+      }
+    },
   });
 
   const markAsReadMutation = useMutation({
     mutationFn: async (id: number) => {
       return apiRequest("PUT", `/api/contact-messages/${id}/read`);
     },
+    onMutate: async (id) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["/api/contact-messages"] });
+
+      // Snapshot the previous value
+      const previousData = queryClient.getQueryData(["/api/contact-messages"]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(["/api/contact-messages"], (old: any[]) => {
+        return old
+          ? old.map((item: any) =>
+              item.id === id ? { ...item, isRead: true } : item
+            )
+          : [];
+      });
+
+      // Return a context object with the snapshotted value
+      return { previousData };
+    },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/contact-messages"] });
+    },
+    onError: (error, id, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      if (context?.previousData) {
+        queryClient.setQueryData(
+          ["/api/contact-messages"],
+          context.previousData
+        );
+      }
+
+      toast({
+        title: "Error",
+        description: "Failed to mark message as read. Please try again.",
+        variant: "destructive",
+      });
+    },
+    onSettled: () => {
+      // Always refetch after error or success
       queryClient.invalidateQueries({ queryKey: ["/api/contact-messages"] });
     },
   });

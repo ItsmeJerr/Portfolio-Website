@@ -1,218 +1,76 @@
-<<<<<<< HEAD
+# Email Setup Guide
 
-# Setup Email untuk Contact Form
+This guide will help you set up email functionality for the contact form in your portfolio website.
 
-## Konfigurasi Gmail Pribadi
+## Overview
 
-### 1. Untuk Email Pribadi (mbintangal05@gmail.com)
+The contact form will:
 
-#### A. Aktifkan 2-Factor Authentication
+1. Save message data to database
+2. Send notification email to you
+3. Send auto-reply to the sender
 
-1. Buka [Google Account Settings](https://myaccount.google.com/)
-2. Login dengan `mbintangal05@gmail.com`
-3. Pilih "Security"
-4. Aktifkan "2-Step Verification"
+## Setup Steps
 
-#### B. Buat App Password
+### 1. Enable 2-Factor Authentication (2FA)
 
-1. Setelah 2FA aktif, kembali ke "Security"
-2. Cari "App passwords" (di bawah 2-Step Verification)
-3. Pilih "Mail" dan "Other (Custom name)"
-4. Beri nama: "Portfolio Website"
-5. Klik "Generate"
-6. **Copy password yang muncul** (16 karakter)
+1. Go to your Google Account settings
+2. Navigate to "Security"
+3. Enable "2-Step Verification"
+4. After 2FA is active, go back to "Security"
+5. Find "App passwords" (appears after 2FA is enabled)
+6. Generate a new app password for "Mail"
+7. Copy the generated password (16 characters)
 
-#### C. Update File .env
+### 2. Configure Environment Variables
 
-Edit file `.env` dan ganti dengan konfigurasi yang benar:
-
-```env
-DATABASE_URL="mysql://root:010304@localhost:3306/portfolio_db"
-NODE_ENV=development
-PORT=3000
-
-# Email Configuration (untuk Gmail)
-EMAIL_USER="mbintangal05@gmail.com"
-EMAIL_PASS="your-16-character-app-password"
-```
-
-### 2. Restart Aplikasi
-
-```bash
-npm run dev
-```
-
-## Cara Kerja
-
-1. **User mengisi form contact** → Data disimpan ke database
-2. **Email dikirim ke Anda** → Notifikasi pesan baru ke mbintangal05@gmail.com
-3. **Auto-reply dikirim ke user** → Konfirmasi pesan diterima
-
-## Test Email
-
-Setelah setup, test dengan mengirim pesan dari form contact di website. Cek:
-
-1. Console log aplikasi untuk status email
-2. Inbox `mbintangal05@gmail.com` untuk pesan contact
-3. Email pengirim untuk auto-reply
-
-## Status Saat Ini
-
-✅ **Contact form berfungsi** - Data tersimpan ke database  
-⚠️ **Email belum dikonfigurasi** - Perlu setup App Password untuk mbintangal05@gmail.com  
-✅ **Error handling** - Aplikasi tidak crash jika email gagal
-
-## Cara Kerja
-
-1. **User mengisi form contact** → Data disimpan ke database
-2. **Email dikirim ke Anda** → Notifikasi pesan baru
-3. **Auto-reply dikirim ke user** → Konfirmasi pesan diterima
-
-## Troubleshooting
-
-### Error: "Invalid login"
-
-- Pastikan menggunakan App Password, bukan password biasa
-- Pastikan 2FA sudah aktif
-
-### Error: "Less secure app access"
-
-- Gmail tidak lagi mendukung "less secure apps"
-- Harus menggunakan App Password
-
-### Email tidak terkirim
-
-- Cek console log untuk error detail
-- Pastikan EMAIL_USER dan EMAIL_PASS sudah benar
-- Cek folder Spam di Gmail
-
-## Alternatif Email Service
-
-Jika tidak ingin pakai Gmail, bisa ganti di `server/email.ts`:
-
-### Outlook/Hotmail
-
-```typescript
-const transporter = nodemailer.createTransporter({
-  service: "outlook",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-```
-
-### Custom SMTP
-
-```typescript
-const transporter = nodemailer.createTransporter({
-  host: "smtp.your-provider.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-```
-
-=======
-
-# Setup Email untuk Contact Form
-
-## Konfigurasi Gmail Pribadi
-
-### 1. Untuk Email Pribadi (mbintangal05@gmail.com)
-
-#### A. Aktifkan 2-Factor Authentication
-
-1. Buka [Google Account Settings](https://myaccount.google.com/)
-2. Login dengan `mbintangal05@gmail.com`
-3. Pilih "Security"
-4. Aktifkan "2-Step Verification"
-
-#### B. Buat App Password
-
-1. Setelah 2FA aktif, kembali ke "Security"
-2. Cari "App passwords" (di bawah 2-Step Verification)
-3. Pilih "Mail" dan "Other (Custom name)"
-4. Beri nama: "Portfolio Website"
-5. Klik "Generate"
-6. **Copy password yang muncul** (16 karakter)
-
-#### C. Update File .env
-
-Edit file `.env` dan ganti dengan konfigurasi yang benar:
+Edit the `.env` file and replace with the correct configuration:
 
 ```env
 DATABASE_URL="mysql://root:010304@localhost:3306/portfolio_db"
-NODE_ENV=development
-PORT=3000
-
-# Email Configuration (untuk Gmail)
-EMAIL_USER="mbintangal05@gmail.com"
-EMAIL_PASS="your-16-character-app-password"
+EMAIL_USER="your-email@gmail.com"
+EMAIL_PASS="your-app-password-here"
 ```
 
-### 2. Restart Aplikasi
+Replace:
 
-```bash
-npm run dev
-```
+- `your-email@gmail.com` with your actual Gmail address
+- `your-app-password-here` with the app password you generated
 
-## Cara Kerja
+### 3. How It Works
 
-1. **User mengisi form contact** → Data disimpan ke database
-2. **Email dikirim ke Anda** → Notifikasi pesan baru ke mbintangal05@gmail.com
-3. **Auto-reply dikirim ke user** → Konfirmasi pesan diterima
+1. **User fills contact form** → Data saved to database
+2. **Email sent to you** → New message notification to your-email@gmail.com
+3. **Auto-reply sent to user** → Confirmation message received
 
-## Test Email
+## Testing
 
-Setelah setup, test dengan mengirim pesan dari form contact di website. Cek:
+After setup, test by sending a message from the contact form on the website. Check:
 
-1. Console log aplikasi untuk status email
-2. Inbox `mbintangal05@gmail.com` untuk pesan contact
-3. Email pengirim untuk auto-reply
-
-## Status Saat Ini
-
-✅ **Contact form berfungsi** - Data tersimpan ke database  
-⚠️ **Email belum dikonfigurasi** - Perlu setup App Password untuk mbintangal05@gmail.com  
-✅ **Error handling** - Aplikasi tidak crash jika email gagal
-
-## Cara Kerja
-
-1. **User mengisi form contact** → Data disimpan ke database
-2. **Email dikirim ke Anda** → Notifikasi pesan baru
-3. **Auto-reply dikirim ke user** → Konfirmasi pesan diterima
+1. Database for saved message
+2. Inbox `your-email@gmail.com` for contact message
+3. Sender's email for auto-reply
 
 ## Troubleshooting
 
-### Error: "Invalid login"
+### Email not sending
 
-- Pastikan menggunakan App Password, bukan password biasa
-- Pastikan 2FA sudah aktif
+**Common issues:**
 
-### Error: "Less secure app access"
+- Gmail no longer supports "less secure apps"
+- App password not generated correctly
+- 2FA not enabled
 
-- Gmail tidak lagi mendukung "less secure apps"
-- Harus menggunakan App Password
+**Solution:**
+Follow the setup steps above to generate an app password.
 
-### Email tidak terkirim
+### Alternative Email Providers
 
-- Cek console log untuk error detail
-- Pastikan EMAIL_USER dan EMAIL_PASS sudah benar
-- Cek folder Spam di Gmail
-
-## Alternatif Email Service
-
-Jika tidak ingin pakai Gmail, bisa ganti di `server/email.ts`:
-
-### Outlook/Hotmail
+If you don't want to use Gmail, you can change it in `server/email.ts`:
 
 ```typescript
 const transporter = nodemailer.createTransporter({
-  service: "outlook",
+  service: "outlook", // or "yahoo", "hotmail", etc.
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -220,18 +78,88 @@ const transporter = nodemailer.createTransporter({
 });
 ```
 
-### Custom SMTP
+## Security Notes
 
-```typescript
-const transporter = nodemailer.createTransporter({
-  host: "smtp.your-provider.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+- Never commit your `.env` file to version control
+- Use app passwords, not your regular password
+- App passwords are 16 characters long
+- Each app password can only be viewed once
+
+## Complete Setup Example
+
+### 1. Enable 2FA and Generate App Password
+
+1. Go to Google Account → Security
+2. Enable 2-Step Verification
+3. Go back to Security → App passwords
+4. Generate password for "Mail"
+5. Copy the 16-character password
+
+### 2. Configure Environment Variables
+
+Edit file `.env` and replace with correct configuration:
+
+```env
+DATABASE_URL="mysql://root:010304@localhost:3306/portfolio_db"
+EMAIL_USER="mbintangal05@gmail.com"
+EMAIL_PASS="abcd efgh ijkl mnop"
 ```
 
-> > > > > > > 04b1e09d799b127dd979fa8563885b054cc5e0e0
+### 3. Test the Setup
+
+1. Start the server: `npm run dev`
+2. Go to contact page
+3. Send a test message
+4. Check your email inbox
+5. Check sender's email for auto-reply
+
+## Status Check
+
+✅ **Contact form working** - Data saved to database  
+⚠️ **Email not configured** - Need to setup App Password for mbintangal05@gmail.com  
+✅ **Error handling** - App doesn't crash if email fails
+
+## How It Works (Detailed)
+
+1. **User fills contact form** → Data saved to database
+2. **Email sent to you** → New message notification
+3. **Auto-reply sent to user** → Confirmation message received
+
+## Email Templates
+
+The system uses two email templates:
+
+### 1. Notification Email (to you)
+
+- Subject: `[Portfolio Contact] {subject}`
+- Contains: Sender info, message content, timestamp
+
+### 2. Auto-reply Email (to sender)
+
+- Subject: `Thank you for your message - Portfolio Website`
+- Contains: Thank you message, response time, portfolio links
+
+## Troubleshooting Common Issues
+
+### "Invalid login" error
+
+- Make sure you're using app password, not regular password
+- Verify 2FA is enabled
+- Check email address is correct
+
+### "Less secure app" error
+
+- Gmail no longer supports "less secure apps"
+- You must use app passwords with 2FA enabled
+
+### Email not received
+
+- Check spam folder
+- Verify app password is correct
+- Check server logs for errors
+
+### Auto-reply not sent
+
+- Check if sender email is valid
+- Verify email configuration
+- Check server logs for errors

@@ -86,8 +86,8 @@ export function ProfileForm({ profile, isLoading }: ProfileFormProps) {
       if (!res.ok) {
         const err = await res.json();
         toast({
-          title: "Upload Gagal",
-          description: err.message || "Gagal upload gambar.",
+          title: "Upload failed",
+          description: err.message || "Failed to upload image.",
           variant: "destructive",
         });
         return;
@@ -96,14 +96,15 @@ export function ProfileForm({ profile, isLoading }: ProfileFormProps) {
       if (data.url) {
         setImageUrl(data.url);
         toast({
-          title: "Upload Berhasil",
-          description: "Gambar berhasil di-upload.",
+          title: "Success",
+          description: "Image uploaded successfully.",
+          variant: "success",
         });
       }
     } catch (err) {
       toast({
-        title: "Upload Gagal",
-        description: "Terjadi error saat upload gambar.",
+        title: "Error",
+        description: "An error occurred while uploading the image.",
         variant: "destructive",
       });
     } finally {

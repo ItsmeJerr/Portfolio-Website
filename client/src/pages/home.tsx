@@ -26,6 +26,7 @@ import type {
 } from "@shared/schema";
 import { getSkillCategoryConfig } from "@/lib/types";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
+import { useState } from "react";
 
 function LoadingSkeleton() {
   return (
@@ -88,19 +89,46 @@ export default function Home() {
   const educationReveal = useScrollReveal();
   const activitiesReveal = useScrollReveal();
 
+  const [previewImg, setPreviewImg] = useState<string | null>(null);
+
   if (profileLoading) {
     return <LoadingSkeleton />;
   }
 
   return (
     <div className="min-h-screen">
+      {/* Image Preview Modal */}
+      {previewImg && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          onClick={() => setPreviewImg(null)}
+        >
+          <div
+            className="relative max-w-2xl w-full flex justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute -top-4 -right-4 bg-white rounded-full shadow p-1 text-black hover:bg-gray-200 z-10"
+              onClick={() => setPreviewImg(null)}
+              aria-label="Close preview"
+            >
+              ×
+            </button>
+            <img
+              src={previewImg}
+              alt="Preview"
+              className="rounded-2xl max-h-[80vh] w-auto object-contain shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
       {/* Hero Section */}
       <section className="py-16 bg-gradient-to-br from-primary/5 to-accent/5 dark:from-primary/10 dark:to-accent/10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             <div className="animate-slide-up">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6">
-                Hi, Saya <span className="text-primary">Developer</span> &{" "}
+                Hi, I am <span className="text-primary">Developer</span> &{" "}
                 <span className="text-accent">Designer</span>
               </h1>
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
@@ -130,7 +158,10 @@ export default function Home() {
               <img
                 src={profile?.image || "/pp_bintang.png"}
                 alt="Foto Bintang"
-                className="rounded-2xl shadow-2xl w-full h-auto max-w-md mx-auto"
+                className="rounded-2xl shadow-2xl w-full h-auto max-w-md mx-auto cursor-pointer"
+                onClick={() =>
+                  setPreviewImg(profile?.image || "/pp_bintang.png")
+                }
               />
             </div>
           </div>
@@ -148,8 +179,9 @@ export default function Home() {
               About Me
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Learn more about my background, passion, and what drives me to
-              create amazing digital experiences.
+              Learn more about my journey as an Informatics Engineering student,
+              my passion for web development, IoT systems, and data analysis —
+              and how I turn ideas into real, functional projects.
             </p>
           </div>
           <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -163,7 +195,7 @@ export default function Home() {
                     Full Name
                   </h3>
                   <p className="text-muted-foreground">
-                    {profile?.fullName || "John Doe Developer"}
+                    {profile?.fullName || "M. Bintang Alffajry"}
                   </p>
                 </div>
               </div>
@@ -174,7 +206,7 @@ export default function Home() {
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Age</h3>
                   <p className="text-muted-foreground">
-                    {profile?.age ? `${profile.age} Years Old` : "28 Years Old"}
+                    {profile?.age ? `${profile.age} Years Old` : "21 Years Old"}
                   </p>
                 </div>
               </div>
@@ -187,7 +219,7 @@ export default function Home() {
                     Location
                   </h3>
                   <p className="text-muted-foreground">
-                    {profile?.location || "Jakarta, Indonesia"}
+                    {profile?.location || "Bekasi, Indonesia"}
                   </p>
                 </div>
               </div>
@@ -200,7 +232,7 @@ export default function Home() {
                     Position
                   </h3>
                   <p className="text-muted-foreground">
-                    {profile?.position || "Senior Full Stack Developer"}
+                    {profile?.position || "Developer & Designer"}
                   </p>
                 </div>
               </div>
@@ -212,7 +244,7 @@ export default function Home() {
                 </h3>
                 <p className="text-muted-foreground leading-relaxed">
                   {profile?.bio ||
-                    "I am a passionate developer with over 5 years of experience creating modern web applications. I love solving complex problems and turning creative ideas into functional, beautiful digital solutions. My approach combines technical expertise with user-centered design principles to deliver exceptional results."}
+                    "Hello! I'm M. Bintang Alffajry, a 4th-semester student majoring in Informatics Engineering. I have a strong interest in web development, IoT-based systems, and data analysis. I actively work on both academic and personal projects to enhance my practical skills and technical experience."}
                 </p>
               </CardContent>
             </Card>
@@ -228,7 +260,9 @@ export default function Home() {
               Skills & Expertise
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Technologies and tools I use to bring ideas to life
+              A collection of technologies and tools I use as an aspiring
+              developer to build websites, smart systems, and data-driven
+              solutions — from HTML to ESP32 and everything in between.
             </p>
           </div>
 
@@ -302,7 +336,11 @@ export default function Home() {
               Work Experience
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              My professional journey and key achievements
+              Although I'm still a student, I've been actively involved in
+              various academic and independent projects that simulate real-world
+              challenges. These experiences have helped me strengthen my skills
+              in web development, IoT, and team collaboration — laying a solid
+              foundation for my professional journey ahead.
             </p>
           </div>
 
@@ -335,7 +373,7 @@ export default function Home() {
                   <div className="absolute -left-2 top-0 w-4 h-4 bg-primary rounded-full" />
                   <Card className="transition-transform duration-300 group-hover:scale-105 group-hover:shadow-2xl overflow-hidden">
                     <CardContent className="p-6">
-                      {/* Grid Gambar Experience */}
+                      {/* Experience Images Grid */}
                       {Array.isArray(experience.images) &&
                         experience.images.length > 0 && (
                           <div className="flex flex-wrap gap-2 justify-center mb-4">
@@ -343,7 +381,8 @@ export default function Home() {
                               (img: string, idx: number) => (
                                 <div
                                   key={img}
-                                  className="relative overflow-hidden rounded-lg"
+                                  className="relative overflow-hidden rounded-lg cursor-pointer"
+                                  onClick={() => setPreviewImg(img)}
                                 >
                                   <img
                                     src={img}
@@ -401,7 +440,11 @@ export default function Home() {
               Education
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Academic background and continuous learning journey
+              My academic journey in Informatics Engineering has shaped the
+              foundation of my technical knowledge and critical thinking.
+              Through coursework and hands-on projects, I continue to explore
+              various areas in technology, including programming, IoT, and data
+              systems.
             </p>
           </div>
           <div className="grid md:grid-cols-2 gap-8">
@@ -448,7 +491,7 @@ export default function Home() {
                       Certifications
                     </h3>
                     <p className="text-accent font-medium">
-                      Professional Development
+                      Various seminars and leadership programs.
                     </p>
                   </div>
                 </div>
@@ -496,7 +539,10 @@ export default function Home() {
               Activities & Interests
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Beyond coding - community involvement and personal interests
+              Beyond coding, I enjoy exploring tech communities, contributing to
+              team-based projects, and learning about new innovations in IoT and
+              web development. I'm also passionate about design, open-source
+              collaboration, and helping others through tech-based solutions.
             </p>
           </div>
 
@@ -518,12 +564,13 @@ export default function Home() {
               {activities.map((activity) => (
                 <Card key={activity.id}>
                   <CardContent className="p-6 text-center">
-                    {/* Gambar Activity */}
+                    {/* Activity Image */}
                     {activity.image ? (
                       <img
                         src={activity.image}
                         alt={activity.title}
-                        className="w-24 h-24 object-cover rounded-xl mx-auto mb-4 border shadow-md"
+                        className="w-24 h-24 object-cover rounded-xl mx-auto mb-4 border shadow-md cursor-pointer"
+                        onClick={() => setPreviewImg(activity.image)}
                       />
                     ) : (
                       <div

@@ -117,15 +117,15 @@ export function ActivityForm({ activity, isOpen, onClose }: ActivityFormProps) {
         setValue("image", data.url as any, { shouldValidate: true });
       } else {
         toast({
-          title: "Upload gagal",
-          description: data.message || "Gagal upload gambar",
+          title: "Upload failed",
+          description: data.message || "Failed to upload image",
           variant: "destructive",
         });
       }
     } catch (err) {
       toast({
-        title: "Upload gagal",
-        description: "Gagal upload gambar",
+        title: "Upload failed",
+        description: "Failed to upload image",
         variant: "destructive",
       });
     } finally {
@@ -146,7 +146,7 @@ export function ActivityForm({ activity, isOpen, onClose }: ActivityFormProps) {
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Upload & Preview Gambar */}
+          {/* Upload & Preview Image */}
           <div className="flex flex-col items-center gap-2">
             {imageUrl ? (
               <img
@@ -203,7 +203,7 @@ export function ActivityForm({ activity, isOpen, onClose }: ActivityFormProps) {
             )}
           </div>
           <div>
-            <Label htmlFor="icon">Icon (misal: lucide-heart)</Label>
+            <Label htmlFor="icon">Icon (e.g., lucide-heart)</Label>
             <Input id="icon" {...register("icon")} className="mt-2" />
             {errors.icon && (
               <p className="text-sm text-destructive mt-1">
@@ -212,7 +212,7 @@ export function ActivityForm({ activity, isOpen, onClose }: ActivityFormProps) {
             )}
           </div>
           <div>
-            <Label htmlFor="color">Color (misal: pink, blue, green)</Label>
+            <Label htmlFor="color">Color (e.g., pink, blue, green)</Label>
             <Input id="color" {...register("color")} className="mt-2" />
             {errors.color && (
               <p className="text-sm text-destructive mt-1">

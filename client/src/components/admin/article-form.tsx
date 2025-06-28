@@ -163,15 +163,15 @@ export function ArticleForm({ article, isOpen, onClose }: ArticleFormProps) {
         setValue("imageUrl", data.url, { shouldValidate: true });
       } else {
         toast({
-          title: "Gagal upload gambar",
-          description: data.message || "Unknown error",
+          title: "Upload failed",
+          description: data.message || "Failed to upload image",
           variant: "destructive",
         });
       }
     } catch (err) {
       toast({
-        title: "Gagal upload gambar",
-        description: "Terjadi error saat upload.",
+        title: "Upload failed",
+        description: "Failed to upload image",
         variant: "destructive",
       });
     } finally {
@@ -259,13 +259,12 @@ export function ArticleForm({ article, isOpen, onClose }: ArticleFormProps) {
               placeholder="https://example.com/article"
             />
             <p className="text-sm text-muted-foreground mt-1">
-              Link eksternal ke artikel. Jika kosong, akan menampilkan
-              notifikasi.
+              External link to the article. If empty, will show notification.
             </p>
           </div>
 
           <div>
-            <Label>Gambar Artikel</Label>
+            <Label>Article Image</Label>
             {imageUrl && (
               <img
                 src={imageUrl}
@@ -290,8 +289,8 @@ export function ArticleForm({ article, isOpen, onClose }: ArticleFormProps) {
               {uploading
                 ? "Uploading..."
                 : imageUrl
-                ? "Ganti Gambar"
-                : "Upload Gambar"}
+                ? "Change Image"
+                : "Upload Image"}
             </Button>
             {errors.imageUrl && (
               <p className="text-sm text-destructive mt-1">
@@ -339,7 +338,8 @@ export function ArticleForm({ article, isOpen, onClose }: ArticleFormProps) {
               />
               <Label htmlFor="published">Published</Label>
               <span className="text-xs text-muted-foreground ml-2">
-                (Artikel akan langsung tampil di halaman publik jika dicentang)
+                (Article will be displayed on public page immediately if
+                checked)
               </span>
             </div>
 
