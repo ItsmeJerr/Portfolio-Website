@@ -192,6 +192,25 @@ async function handleGet(path: string, searchParams: URLSearchParams) {
 
 async function handlePost(path: string, body: any) {
   const table = path.split("/")[0];
+  
+  // Route through Express API for admin data operations
+  if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
+    try {
+      const response = await fetch(`http://localhost:5000/api/${path}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        return buildErrorResponse(data?.message || "Creation failed", response.status);
+      }
+      return buildResponse(data, 201);
+    } catch (err: any) {
+      return buildErrorResponse(err?.message || "POST request failed", 500);
+    }
+  }
+
   switch (table) {
     case "profile": {
       const profileData = preparePayload(path, body);
@@ -219,17 +238,6 @@ async function handlePost(path: string, body: any) {
       if (error) return buildErrorResponse(error.message, 500);
       return buildResponse(data?.[0] ?? null, 201);
     }
-    case "skills":
-    case "experiences":
-    case "education":
-    case "certifications":
-    case "activities":
-    case "articles": {
-      const payload = preparePayload(path, body);
-      const { data, error } = await supabase.from(table).insert(payload).select("*");
-      if (error) return buildErrorResponse(error.message, 500);
-      return buildResponse(data?.[0] ?? null, 201);
-    }
     default:
       return buildErrorResponse(`Unknown POST path ${path}`, 404);
   }
@@ -248,6 +256,24 @@ async function handlePut(path: string, body: any) {
       .select("*");
     if (error) return buildErrorResponse(error.message, 500);
     return buildResponse(data?.[0] ?? null);
+  }
+
+  // Route through Express API for experiences, skills, and other admin data
+  if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
+    try {
+      const response = await fetch(`http://localhost:5000/api/${path}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        return buildErrorResponse(data?.message || "Update failed", response.status);
+      }
+      return buildResponse(data);
+    } catch (err: any) {
+      return buildErrorResponse(err?.message || "Update request failed", 500);
+    }
   }
 
   const idMatch = path.match(/\/(\d+)$/);
@@ -280,8 +306,16 @@ async function handlePut(path: string, body: any) {
   }
 
   const payload = preparePayload(path, body);
+  console.log(`[UPDATE ${table}/${id}] payload:`, payload);
   const { data, error } = await supabase.from(table).update(payload).eq("id", id).select("*");
-  if (error) return buildErrorResponse(error.message, 500);
+  if (error) {
+    console.error(`[UPDATE ERROR ${table}/${id}]:`, error);
+    return buildErrorResponse(error.message || "Update failed", 500);
+  }
+  if (!data || data.length === 0) {
+    console.warn(`[UPDATE ${table}/${id}] No data returned after update`);
+  }
+  console.log(`[UPDATE ${table}/${id}] success, data:`, data?.[0]);
   return buildResponse(data?.[0] ?? null);
 }
 
@@ -292,6 +326,24 @@ async function handleDelete(path: string) {
   if (!id) {
     return buildErrorResponse("Missing id for delete", 400);
   }
+  
+  // Route through Express API for admin data
+  if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
+    try {
+      const response = await fetch(`http://localhost:5000/api/${path}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        return buildErrorResponse(data?.message || "Delete failed", response.status);
+      }
+      return buildResponse(data);
+    } catch (err: any) {
+      return buildErrorResponse(err?.message || "DELETE request failed", 500);
+    }
+  }
+  
   const { data, error } = await supabase.from(table).delete().eq("id", id).select("*");
   if (error) return buildErrorResponse(error.message, 500);
   return buildResponse(data?.[0] ?? null);
