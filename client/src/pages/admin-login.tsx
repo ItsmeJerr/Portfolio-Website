@@ -9,8 +9,8 @@ export default function AdminLogin() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Username dan password hardcode (bisa diganti sesuai kebutuhan)
-    if (username === "bintang123" && password === "rahasia456") {
+    // Username dan password hardcode untuk admin login
+    if (username === "bintang" && password === "bintang123") {
       localStorage.setItem("admin_logged_in", "true");
       setLocation("/admin");
     } else {
