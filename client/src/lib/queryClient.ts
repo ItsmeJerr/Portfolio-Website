@@ -29,6 +29,13 @@ function parseUrl(url: string) {
   return { pathname, searchParams: parsed.searchParams };
 }
 
+function tableToDbName(table: string) {
+  if (table === "contact-messages") {
+    return "contact_messages";
+  }
+  return table;
+}
+
 function normalizeRecord(record: any) {
   if (!record) return record;
 
@@ -458,7 +465,8 @@ async function handleDelete(path: string) {
     return handleAdminResourceDelete(path);
   }
   
-  const { data, error } = await supabase.from(table).delete().eq("id", id).select("*");
+  const dbTable = tableToDbName(table);
+  const { data, error } = await supabase.from(dbTable).delete().eq("id", id).select("*");
   if (error) return buildErrorResponse(error.message, 500);
   return buildResponse(data?.[0] ?? null);
 }
