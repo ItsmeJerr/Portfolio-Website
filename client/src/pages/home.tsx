@@ -578,20 +578,18 @@ export default function Home() {
                         className="w-24 h-24 object-cover rounded-xl mx-auto mb-4 border shadow-md cursor-pointer"
                         onClick={() => setPreviewImg(activity.image)}
                       />
-                    ) : (
-                      {(() => {
-                        const activityColor = getTailwindColorClasses(activity.color);
-                        return (
-                          <div
-                            className={`${activityColor.bg} p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center`}
-                          >
-                            <i
-                              className={`${activity.icon} ${activityColor.text} text-xl`}
-                            />
-                          </div>
-                        );
-                      })()}
-                    )}
+                    ) : (() => {
+                      const activityColor = getTailwindColorClasses(activity.color);
+                      return (
+                        <div
+                          className={`${activityColor.bg} p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center`}
+                        >
+                          <i
+                            className={`${activity.icon} ${activityColor.text} text-xl`}
+                          />
+                        </div>
+                      );
+                    })()}
                     <h3 className="font-semibold text-foreground mb-2">
                       {activity.title}
                     </h3>
