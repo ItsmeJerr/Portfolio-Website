@@ -1,6 +1,10 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 
+// Base API URL for admin mutations. Use VITE_API_URL in production (Vercel),
+// fallback to localhost for local development.
+const API_BASE = (import.meta.env.VITE_API_URL as string) || "http://localhost:3000";
+
 const SUPABASE_DATE_FIELDS = ["createdAt", "updatedAt"];
 
 function buildResponse(body: unknown, status = 200) {
@@ -196,7 +200,7 @@ async function handlePost(path: string, body: any) {
   // Route through Express API for admin data operations
   if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
     try {
-      const response = await fetch(`http://localhost:3000/api/${path}`, {
+      const response = await fetch(`${API_BASE}/api/${path}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -261,7 +265,7 @@ async function handlePut(path: string, body: any) {
   // Route through Express API for experiences, skills, and other admin data
   if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
     try {
-      const response = await fetch(`http://localhost:3000/api/${path}`, {
+      const response = await fetch(`${API_BASE}/api/${path}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -330,7 +334,7 @@ async function handleDelete(path: string) {
   // Route through Express API for admin data
   if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
     try {
-      const response = await fetch(`http://localhost:3000/api/${path}`, {
+      const response = await fetch(`${API_BASE}/api/${path}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });
