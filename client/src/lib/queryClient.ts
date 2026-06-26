@@ -7,6 +7,8 @@ const API_BASE = (import.meta.env.VITE_API_URL as string | undefined)
   ?.replace(/\/$/, "")
   .trim();
 
+const USE_API_PROXY = import.meta.env.VITE_USE_API_PROXY === "true";
+
 function buildResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -293,7 +295,7 @@ async function handlePost(path: string, body: any) {
   const table = path.split("/")[0];
 
   if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
-    if (API_BASE) {
+    if (USE_API_PROXY && API_BASE) {
       try {
         const response = await fetch(`${API_BASE}/api/${path}`, {
           method: "POST",
@@ -306,7 +308,7 @@ async function handlePost(path: string, body: any) {
         }
         return buildResponse(data, 201);
       } catch (err: any) {
-        return buildErrorResponse(err?.message || "POST request failed", 500);
+        return buildErrorResponse(`${err?.message || "POST request failed"} (${API_BASE}/api/${path})`, 500);
       }
     }
     return handleAdminResourcePost(path, body);
@@ -361,7 +363,7 @@ async function handlePut(path: string, body: any) {
 
   // Route through Express API for experiences, skills, and other admin data
   if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
-    if (API_BASE) {
+    if (USE_API_PROXY && API_BASE) {
       try {
         const response = await fetch(`${API_BASE}/api/${path}`, {
           method: "PUT",
@@ -374,7 +376,7 @@ async function handlePut(path: string, body: any) {
         }
         return buildResponse(data);
       } catch (err: any) {
-        return buildErrorResponse(err?.message || "Update request failed", 500);
+        return buildErrorResponse(`${err?.message || "Update request failed"} (${API_BASE}/api/${path})`, 500);
       }
     }
     return handleAdminResourcePut(path, body);
@@ -432,7 +434,7 @@ async function handleDelete(path: string) {
   }
   
   if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
-    if (API_BASE) {
+    if (USE_API_PROXY && API_BASE) {
       try {
         const response = await fetch(`${API_BASE}/api/${path}`, {
           method: "DELETE",
@@ -444,7 +446,7 @@ async function handleDelete(path: string) {
         }
         return buildResponse(data);
       } catch (err: any) {
-        return buildErrorResponse(err?.message || "DELETE request failed", 500);
+        return buildErrorResponse(`${err?.message || "DELETE request failed"} (${API_BASE}/api/${path})`, 500);
       }
     }
     return handleAdminResourceDelete(path);
