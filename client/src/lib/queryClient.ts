@@ -64,6 +64,12 @@ function normalizeRecord(record: any) {
   if (record.updated_at !== undefined) {
     record.updatedAt = record.updated_at;
   }
+  if (record.start_date !== undefined) {
+    record.startDate = record.start_date;
+  }
+  if (record.end_date !== undefined) {
+    record.endDate = record.end_date;
+  }
 
   return record;
 }

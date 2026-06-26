@@ -97,7 +97,7 @@ export function ExperienceForm({
           experience ? "updated" : "created"
         } successfully.`,
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/experiences"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/experiences"], refetchType: "all" });
       onClose();
     },
     onError: (error: any) => {
