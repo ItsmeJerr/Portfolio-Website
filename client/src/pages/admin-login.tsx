@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useLocation } from "wouter";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
@@ -14,18 +15,20 @@ export default function AdminLogin() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+      const { data, error: loginError } = await supabase
+        .from("users")
+        .select("username, password")
+        .eq("username", username)
+        .limit(1)
+        .maybeSingle();
 
-      if (response.ok) {
+      if (loginError) {
+        setError("Login failed. Please try again.");
+      } else if (!data || data.password !== password) {
+        setError("Incorrect username or password!");
+      } else {
         localStorage.setItem("admin_logged_in", "true");
         setLocation("/admin");
-      } else {
-        const errorData = await response.json();
-        setError(errorData?.message || "Incorrect username or password!");
       }
     } catch (err) {
       setError("Login failed. Please try again.");
