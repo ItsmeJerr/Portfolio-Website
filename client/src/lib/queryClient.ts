@@ -196,7 +196,7 @@ async function handlePost(path: string, body: any) {
   // Route through Express API for admin data operations
   if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
     try {
-      const response = await fetch(`http://localhost:5000/api/${path}`, {
+      const response = await fetch(`http://localhost:3000/api/${path}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -261,7 +261,7 @@ async function handlePut(path: string, body: any) {
   // Route through Express API for experiences, skills, and other admin data
   if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
     try {
-      const response = await fetch(`http://localhost:5000/api/${path}`, {
+      const response = await fetch(`http://localhost:3000/api/${path}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -330,7 +330,7 @@ async function handleDelete(path: string) {
   // Route through Express API for admin data
   if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
     try {
-      const response = await fetch(`http://localhost:5000/api/${path}`, {
+      const response = await fetch(`http://localhost:3000/api/${path}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });
