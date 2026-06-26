@@ -15,7 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { uploadImage } from "@/lib/supabaseClient";
-import { type Experience, type InsertExperience } from "@lib/types";
+import { type Experience, type InsertExperience } from "@/lib/types";
 import { insertExperienceSchema } from "@/lib/schemas";
 import { useState, useRef } from "react";
 
@@ -36,12 +36,12 @@ export function ExperienceForm({
   const [technologies, setTechnologies] = useState<string[]>(
     experience?.technologies
       ? typeof experience.technologies === "string"
-        ? experience.technologies.split(",").map((tech) => tech.trim())
+        ? experience.technologies.split(",").map((tech: string) => tech.trim())
         : experience.technologies
       : []
   );
   const [techInput, setTechInput] = useState("");
-  const [images, setImages] = useState<string[]>(experience?.images || []);
+  const [images, setImages] = useState<string[]>(Array.isArray(experience?.images) ? experience.images : []);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -136,7 +136,6 @@ export function ExperienceForm({
         toast({
           title: "Success",
           description: `${uploaded.length} images uploaded successfully.`,
-          variant: "success",
         });
       }
     } catch (err) {
@@ -157,7 +156,7 @@ export function ExperienceForm({
   const onSubmit = (data: InsertExperience) => {
     const submitData = {
       ...data,
-      endDate: isCurrent ? null : data.endDate,
+      endDate: isCurrent ? undefined : data.endDate,
       technologies: technologies.join(", "),
       images: JSON.stringify(images),
     };

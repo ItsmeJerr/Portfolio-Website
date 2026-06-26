@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Clock, Calendar, ExternalLink } from "lucide-react";
-import type { Article } from "@lib/types";
+import type { Article } from "@/lib/types";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
@@ -188,7 +188,7 @@ export default function Articles() {
                         src={fa.imageUrl}
                         alt={fa.title}
                         className="rounded-xl shadow-lg w-full h-auto transition-transform duration-300 group-hover:scale-110 cursor-pointer"
-                        onClick={() => setPreviewImg(fa.imageUrl)}
+                        onClick={() => setPreviewImg(fa.imageUrl!)}
                       />
                     )}
                   </div>
@@ -210,7 +210,7 @@ export default function Articles() {
                     src={article.imageUrl}
                     alt={article.title}
                     className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110 cursor-pointer"
-                    onClick={() => setPreviewImg(article.imageUrl)}
+                    onClick={() => setPreviewImg(article.imageUrl!)}
                   />
                 )}
               </div>

@@ -22,7 +22,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { uploadImage } from "@/lib/supabaseClient";
-import { type Article, type InsertArticle } from "@lib/types";
+import { type Article, type InsertArticle } from "@/lib/types";
 import { insertArticleSchema } from "@/lib/schemas";
 import { generateSlug } from "@/lib/types";
 import { useState, useRef } from "react";

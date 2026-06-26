@@ -119,7 +119,9 @@ export const FlyingStarsBackground: React.FC = () => {
       animRef.current = requestAnimationFrame(animate);
     }
     animRef.current = requestAnimationFrame(animate);
-    return () => animRef.current && cancelAnimationFrame(animRef.current);
+    return () => {
+      if (animRef.current) cancelAnimationFrame(animRef.current);
+    };
   }, []);
 
   // Mouse move event

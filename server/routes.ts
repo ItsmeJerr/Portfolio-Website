@@ -436,9 +436,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .catch((err) => console.error("Failed to send auto-reply:", err));
     } catch (error) {
       console.error("Error POST /api/contact-messages:", error);
+      const message = error instanceof Error ? error.message : "Unknown error";
       res
         .status(400)
-        .json({ message: "Failed to send message", error: error.message });
+        .json({ message: "Failed to send message", error: message });
     }
   });
 

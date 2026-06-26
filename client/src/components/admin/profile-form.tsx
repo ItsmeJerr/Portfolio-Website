@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { uploadImage } from "@/lib/supabaseClient";
-import { type Profile, type InsertProfile } from "@lib/types";
+import { type Profile, type InsertProfile } from "@/lib/types";
 import { insertProfileSchema } from "@/lib/schemas";
 import { useRef, useState } from "react";
 
@@ -82,7 +82,7 @@ export function ProfileForm({ profile, isLoading }: ProfileFormProps) {
       toast({
         title: "Success",
         description: "Image uploaded successfully.",
-        variant: "success",
+
       });
     } catch (err: any) {
       toast({

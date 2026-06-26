@@ -39,7 +39,7 @@ import type {
   Activity,
   Article,
   ContactMessage,
-} from "@lib/types";
+} from "@/lib/types";
 import { useLocation } from "wouter";
 
 interface EditState {

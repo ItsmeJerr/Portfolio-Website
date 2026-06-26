@@ -21,7 +21,7 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { type Skill, type InsertSkill } from "@lib/types";
+import { type Skill, type InsertSkill } from "@/lib/types";
 import { insertSkillSchema } from "@/lib/schemas";
 import { skillCategories } from "@/lib/types";
 

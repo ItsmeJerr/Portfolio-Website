@@ -23,12 +23,12 @@ export async function uploadImage(file: File): Promise<string> {
     throw error ?? new Error("Upload failed");
   }
 
-  const { data: urlData, error: urlError } = supabase.storage
+  const { data: urlData } = supabase.storage
     .from(uploadBucket)
     .getPublicUrl(data.path);
 
-  if (urlError || !urlData.publicUrl) {
-    throw urlError ?? new Error("Failed to get public URL");
+  if (!urlData?.publicUrl) {
+    throw new Error("Failed to get public URL");
   }
 
   return urlData.publicUrl;

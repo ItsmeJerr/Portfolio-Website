@@ -23,7 +23,7 @@ import type {
   Education,
   Certification,
   Activity,
-} from "@lib/types";
+} from "@/lib/types";
 import { getSkillCategoryConfig } from "@/lib/types";
 import { getTailwindColorClasses } from "@/lib/utils";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
@@ -417,9 +417,9 @@ export default function Home() {
                           {(typeof experience.technologies === "string"
                             ? experience.technologies
                                 .split(",")
-                                .map((tech) => tech.trim())
+                                .map((tech: string) => tech.trim())
                             : experience.technologies
-                          ).map((tech) => (
+                          ).map((tech: string) => (
                             <Badge key={tech} variant="secondary">
                               {tech}
                             </Badge>
@@ -576,7 +576,7 @@ export default function Home() {
                         src={activity.image}
                         alt={activity.title}
                         className="w-24 h-24 object-cover rounded-xl mx-auto mb-4 border shadow-md cursor-pointer"
-                        onClick={() => setPreviewImg(activity.image)}
+                        onClick={() => setPreviewImg(activity.image ?? null)}
                       />
                     ) : (() => {
                       const activityColor = getTailwindColorClasses(activity.color);

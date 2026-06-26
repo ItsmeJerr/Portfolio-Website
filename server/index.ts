@@ -1,9 +1,17 @@
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { registerRoutes, serveUploads } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+// Enable CORS for development
+app.use(cors({
+  origin: ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"],
+  credentials: true,
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

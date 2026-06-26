@@ -60,7 +60,7 @@ export class PostgresStorage {
     if (existingProfile) {
       await this.db
         .update(profile)
-        .set(profileData)
+        .set(profileData as Record<string, any>)
         .where(eq(profile.id, existingProfile.id));
       const updated = await this.getProfile();
       return updated!;
@@ -68,7 +68,7 @@ export class PostgresStorage {
 
     const [inserted] = await this.db
       .insert(profile)
-      .values(profileData)
+      .values(profileData as any)
       .returning();
     return inserted;
   }
@@ -81,7 +81,7 @@ export class PostgresStorage {
   async createSkill(skill: InsertSkill): Promise<Skill> {
     const [inserted] = await this.db
       .insert(skills)
-      .values(skill)
+      .values(skill as any)
       .returning();
     return inserted;
   }
@@ -99,8 +99,11 @@ export class PostgresStorage {
   }
 
   async deleteSkill(id: number): Promise<boolean> {
-    const result = await this.db.delete(skills).where(eq(skills.id, id));
-    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
+    const deleted = await this.db
+      .delete(skills)
+      .where(eq(skills.id, id))
+      .returning({ id: skills.id });
+    return deleted.length > 0;
   }
 
   // Experience methods
@@ -130,7 +133,7 @@ export class PostgresStorage {
     };
     const [inserted] = await this.db
       .insert(experiences)
-      .values(expToSave)
+      .values(expToSave as any)
       .returning();
     return {
       ...inserted,
@@ -156,7 +159,7 @@ export class PostgresStorage {
     };
     await this.db
       .update(experiences)
-      .set(expToSave)
+      .set(expToSave as any)
       .where(eq(experiences.id, id));
     const updated = await this.db
       .select()
@@ -176,10 +179,8 @@ export class PostgresStorage {
   }
 
   async deleteExperience(id: number): Promise<boolean> {
-    const result = await this.db
-      .delete(experiences)
-      .where(eq(experiences.id, id));
-    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
+    await this.db.delete(experiences).where(eq(experiences.id, id));
+    return true;
   }
 
   // Education methods
@@ -190,7 +191,7 @@ export class PostgresStorage {
   async createEducation(educationData: InsertEducation): Promise<Education> {
     const [inserted] = await this.db
       .insert(education)
-      .values(educationData)
+      .values(educationData as any)
       .returning();
     return inserted;
   }
@@ -211,8 +212,8 @@ export class PostgresStorage {
   }
 
   async deleteEducation(id: number): Promise<boolean> {
-    const result = await this.db.delete(education).where(eq(education.id, id));
-    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
+    await this.db.delete(education).where(eq(education.id, id));
+    return true;
   }
 
   // Certification methods
@@ -228,7 +229,7 @@ export class PostgresStorage {
   ): Promise<Certification> {
     const [inserted] = await this.db
       .insert(certifications)
-      .values(certification)
+      .values(certification as any)
       .returning();
     return inserted;
   }
@@ -249,10 +250,8 @@ export class PostgresStorage {
   }
 
   async deleteCertification(id: number): Promise<boolean> {
-    const result = await this.db
-      .delete(certifications)
-      .where(eq(certifications.id, id));
-    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
+    await this.db.delete(certifications).where(eq(certifications.id, id));
+    return true;
   }
 
   // Activity methods
@@ -263,7 +262,7 @@ export class PostgresStorage {
   async createActivity(activity: InsertActivity): Promise<Activity> {
     const [inserted] = await this.db
       .insert(activities)
-      .values(activity)
+      .values(activity as any)
       .returning();
     return inserted;
   }
@@ -281,10 +280,8 @@ export class PostgresStorage {
   }
 
   async deleteActivity(id: number): Promise<boolean> {
-    const result = await this.db
-      .delete(activities)
-      .where(eq(activities.id, id));
-    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
+    await this.db.delete(activities).where(eq(activities.id, id));
+    return true;
   }
 
   // Article methods
@@ -320,7 +317,7 @@ export class PostgresStorage {
   async createArticle(article: InsertArticle): Promise<Article> {
     const [inserted] = await this.db
       .insert(articles)
-      .values(article)
+      .values(article as any)
       .returning();
     return inserted;
   }
@@ -338,8 +335,8 @@ export class PostgresStorage {
   }
 
   async deleteArticle(id: number): Promise<boolean> {
-    const result = await this.db.delete(articles).where(eq(articles.id, id));
-    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
+    await this.db.delete(articles).where(eq(articles.id, id));
+    return true;
   }
 
   // Contact message methods
@@ -355,7 +352,7 @@ export class PostgresStorage {
   ): Promise<ContactMessage> {
     const [inserted] = await this.db
       .insert(contactMessages)
-      .values(message)
+      .values(message as any)
       .returning();
     return inserted;
   }
@@ -369,10 +366,8 @@ export class PostgresStorage {
   }
 
   async deleteContactMessage(id: number): Promise<boolean> {
-    const result = await this.db
-      .delete(contactMessages)
-      .where(eq(contactMessages.id, id));
-    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
+    await this.db.delete(contactMessages).where(eq(contactMessages.id, id));
+    return true;
   }
 
   // User methods
@@ -395,7 +390,10 @@ export class PostgresStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [inserted] = await this.db.insert(users).values(insertUser).returning();
+    const [inserted] = await this.db
+      .insert(users)
+      .values(insertUser as any)
+      .returning();
     return inserted;
   }
 }

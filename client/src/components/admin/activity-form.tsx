@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { uploadImage } from "@/lib/supabaseClient";
-import { type Activity, type InsertActivity } from "@lib/types";
+import { type Activity, type InsertActivity } from "@/lib/types";
 import { insertActivitySchema } from "@/lib/schemas";
 import { useRef, useState } from "react";
 
