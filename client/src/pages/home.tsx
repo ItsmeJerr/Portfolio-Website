@@ -15,6 +15,7 @@ import {
   Award,
   Heart,
   ExternalLink,
+  Download,
 } from "lucide-react";
 import type {
   Profile,
@@ -142,6 +143,12 @@ export default function Home() {
                     Get In Touch
                   </Button>
                 </Link>
+                <Button asChild variant="outline" size="lg">
+                  <a href="/cv.pdf" download="Bintang-Alffajry-CV.pdf">
+                    <Download className="h-4 w-4" />
+                    Download CV
+                  </a>
+                </Button>
                 <Button
                   variant="outline"
                   size="lg"
