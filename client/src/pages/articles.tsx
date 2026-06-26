@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Clock, Calendar, ExternalLink } from "lucide-react";
-import type { Article } from "@shared/schema";
+import type { Article } from "@lib/types";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";

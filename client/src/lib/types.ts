@@ -1,3 +1,120 @@
+// Data models (client-safe, no Drizzle)
+export interface User {
+  id: number;
+  username: string;
+  password: string;
+}
+
+export interface Profile {
+  id: number;
+  fullName: string;
+  position: string;
+  email: string;
+  phone?: string;
+  location?: string;
+  bio?: string;
+  age?: number;
+  linkedinUrl?: string;
+  githubUrl?: string;
+  twitterUrl?: string;
+  instagramUrl?: string;
+  youtubeUrl?: string;
+  image?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface Skill {
+  id: number;
+  name: string;
+  category: string;
+  proficiency: number;
+  description?: string;
+  createdAt?: Date;
+}
+
+export interface Experience {
+  id: number;
+  title: string;
+  company: string;
+  startDate: string;
+  endDate?: string;
+  description?: string;
+  technologies?: string;
+  images?: string;
+  createdAt?: Date;
+}
+
+export interface Education {
+  id: number;
+  degree: string;
+  institution: string;
+  year: string;
+  description?: string;
+  gpa?: string;
+  image?: string;
+  createdAt?: Date;
+}
+
+export interface Certification {
+  id: number;
+  name: string;
+  issuer: string;
+  year: string;
+  credentialUrl?: string;
+  createdAt?: Date;
+}
+
+export interface Activity {
+  id: number;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  image?: string;
+  createdAt?: Date;
+}
+
+export interface Article {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  readTime: number;
+  imageUrl?: string;
+  image?: string;
+  url?: string;
+  published: boolean;
+  featured: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface ContactMessage {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  subject: string;
+  message: string;
+  isRead: boolean;
+  createdAt?: Date;
+}
+
+// Insert types
+export type InsertUser = Omit<User, "id">;
+export type InsertProfile = Omit<Profile, "id" | "createdAt" | "updatedAt">;
+export type InsertSkill = Omit<Skill, "id" | "createdAt">;
+export type InsertExperience = Omit<Experience, "id" | "createdAt">;
+export type InsertEducation = Omit<Education, "id" | "createdAt">;
+export type InsertCertification = Omit<Certification, "id" | "createdAt">;
+export type InsertActivity = Omit<Activity, "id" | "createdAt">;
+export type InsertArticle = Omit<Article, "id" | "createdAt" | "updatedAt">;
+export type InsertContactMessage = Omit<ContactMessage, "id" | "isRead" | "createdAt">;
+
+// UI/UX types
 export interface SkillCategory {
   name: string;
   color: string;

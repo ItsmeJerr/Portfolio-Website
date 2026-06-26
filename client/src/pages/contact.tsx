@@ -25,7 +25,7 @@ import {
   Instagram,
   Youtube,
 } from "lucide-react";
-import type { Profile, InsertContactMessage } from "@shared/schema";
+import type { Profile, InsertContactMessage } from "@lib/types";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 
 const contactFormSchema = z.object({

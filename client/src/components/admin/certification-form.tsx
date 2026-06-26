@@ -12,11 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import {
-  insertCertificationSchema,
-  type Certification,
-  type InsertCertification,
-} from "@shared/schema";
+import { type Certification, type InsertCertification } from "@lib/types";
+import { insertCertificationSchema } from "@/lib/schemas";
 
 interface CertificationFormProps {
   certification?: Certification;

@@ -23,7 +23,7 @@ import type {
   Education,
   Certification,
   Activity,
-} from "@shared/schema";
+} from "@lib/types";
 import { getSkillCategoryConfig } from "@/lib/types";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useState } from "react";

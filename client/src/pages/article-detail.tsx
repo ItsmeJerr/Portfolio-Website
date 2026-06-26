@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Clock, Calendar, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
-import type { Article } from "@shared/schema";
+import type { Article } from "@lib/types";
 
 export default function ArticleDetail() {
   const [, setLocation] = useLocation();

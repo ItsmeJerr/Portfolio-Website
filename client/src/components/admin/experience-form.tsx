@@ -15,11 +15,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { uploadImage } from "@/lib/supabaseClient";
-import {
-  insertExperienceSchema,
-  type Experience,
-  type InsertExperience,
-} from "@shared/schema";
+import { type Experience, type InsertExperience } from "@lib/types";
+import { insertExperienceSchema } from "@/lib/schemas";
 import { useState, useRef } from "react";
 
 interface ExperienceFormProps {

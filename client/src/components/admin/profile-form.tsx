@@ -9,11 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { uploadImage } from "@/lib/supabaseClient";
-import {
-  insertProfileSchema,
-  type Profile,
-  type InsertProfile,
-} from "@shared/schema";
+import { type Profile, type InsertProfile } from "@lib/types";
+import { insertProfileSchema } from "@/lib/schemas";
 import { useRef, useState } from "react";
 
 interface ProfileFormProps {
