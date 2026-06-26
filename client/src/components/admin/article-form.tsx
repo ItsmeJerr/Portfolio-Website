@@ -173,51 +173,52 @@ export function ArticleForm({ article, isOpen, onClose }: ArticleFormProps) {
             {article ? "Edit Article" : "Add New Article"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           <div>
-            <Label htmlFor="title">Title</Label>
-            <Input id="title" {...register("title")} className="mt-2" />
+            <Label htmlFor="title" className="text-sm">Title</Label>
+            <Input id="title" {...register("title")} className="mt-1 h-9" />
             {errors.title && (
-              <p className="text-sm text-destructive mt-1">
+              <p className="text-xs text-destructive mt-1">
                 {errors.title.message}
               </p>
             )}
           </div>
 
           <div>
-            <Label htmlFor="slug">Slug</Label>
+            <Label htmlFor="slug" className="text-sm">Slug</Label>
             <Input
               id="slug"
               {...register("slug")}
-              className="mt-2"
+              className="mt-1 h-9"
               onChange={(e) => {
                 setAutoSlug(false);
                 setValue("slug", e.target.value);
               }}
             />
             {errors.slug && (
-              <p className="text-sm text-destructive mt-1">
+              <p className="text-xs text-destructive mt-1">
                 {errors.slug.message}
               </p>
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category" className="text-sm">Category</Label>
               <Input
                 id="category"
                 {...register("category", { required: "Category is required" })}
                 placeholder="e.g., Web Development"
+                className="mt-1 h-9 text-sm"
               />
               {errors.category && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-xs text-red-500 mt-1">
                   {errors.category.message}
                 </p>
               )}
             </div>
             <div>
-              <Label htmlFor="readTime">Read Time (minutes)</Label>
+              <Label htmlFor="readTime" className="text-sm">Read Time (min)</Label>
               <Input
                 id="readTime"
                 type="number"
@@ -226,10 +227,11 @@ export function ArticleForm({ article, isOpen, onClose }: ArticleFormProps) {
                   valueAsNumber: true,
                   min: 1,
                 })}
-                placeholder="e.g., 5"
+                placeholder="5"
+                className="mt-1 h-9 text-sm"
               />
               {errors.readTime && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-xs text-red-500 mt-1">
                   {errors.readTime.message}
                 </p>
               )}
@@ -237,25 +239,26 @@ export function ArticleForm({ article, isOpen, onClose }: ArticleFormProps) {
           </div>
 
           <div>
-            <Label htmlFor="url">Article URL (Optional)</Label>
+            <Label htmlFor="url" className="text-sm">Article URL (Optional)</Label>
             <Input
               id="url"
               type="url"
               {...register("url")}
               placeholder="https://example.com/article"
+              className="mt-1 h-9 text-sm"
             />
-            <p className="text-sm text-muted-foreground mt-1">
-              External link to the article. If empty, will show notification.
+            <p className="text-xs text-muted-foreground mt-1">
+              External link (if empty, will show internal view)
             </p>
           </div>
 
           <div>
-            <Label>Article Image</Label>
+            <Label className="text-sm">Article Image</Label>
             {imageUrl && (
               <img
                 src={imageUrl}
                 alt="Preview"
-                className="w-32 h-32 object-cover rounded mb-2 border shadow"
+                className="w-20 h-20 object-cover rounded mb-2 border shadow"
               />
             )}
             <input
@@ -268,9 +271,10 @@ export function ArticleForm({ article, isOpen, onClose }: ArticleFormProps) {
             <Button
               type="button"
               variant="outline"
+              size="sm"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
-              className="mt-2"
+              className="mt-1"
             >
               {uploading
                 ? "Uploading..."
@@ -279,54 +283,50 @@ export function ArticleForm({ article, isOpen, onClose }: ArticleFormProps) {
                 : "Upload Image"}
             </Button>
             {errors.imageUrl && (
-              <p className="text-sm text-destructive mt-1">
+              <p className="text-xs text-destructive mt-1">
                 {errors.imageUrl.message}
               </p>
             )}
           </div>
 
           <div>
-            <Label htmlFor="excerpt">Excerpt</Label>
+            <Label htmlFor="excerpt" className="text-sm">Excerpt</Label>
             <Textarea
               id="excerpt"
-              rows={3}
+              rows={2}
               {...register("excerpt")}
-              className="mt-2 resize-none"
+              className="mt-1 resize-none text-sm"
             />
             {errors.excerpt && (
-              <p className="text-sm text-destructive mt-1">
+              <p className="text-xs text-destructive mt-1">
                 {errors.excerpt.message}
               </p>
             )}
           </div>
 
           <div>
-            <Label htmlFor="content">Content</Label>
+            <Label htmlFor="content" className="text-sm">Content</Label>
             <Textarea
               id="content"
-              rows={8}
+              rows={3}
               {...register("content")}
-              className="mt-2 resize-none"
+              className="mt-1 resize-none text-sm"
             />
             {errors.content && (
-              <p className="text-sm text-destructive mt-1">
+              <p className="text-xs text-destructive mt-1">
                 {errors.content.message}
               </p>
             )}
           </div>
 
-          <div className="flex space-x-6">
+          <div className="flex gap-4 text-sm">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="published"
                 checked={watch("published")}
                 onCheckedChange={(v) => setValue("published", !!v)}
               />
-              <Label htmlFor="published">Published</Label>
-              <span className="text-xs text-muted-foreground ml-2">
-                (Article will be displayed on public page immediately if
-                checked)
-              </span>
+              <Label htmlFor="published" className="text-xs">Published</Label>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -335,18 +335,19 @@ export function ArticleForm({ article, isOpen, onClose }: ArticleFormProps) {
                 checked={watch("featured")}
                 onCheckedChange={(v) => setValue("featured", !!v)}
               />
-              <Label htmlFor="featured">Featured</Label>
+              <Label htmlFor="featured" className="text-xs">Featured</Label>
             </div>
           </div>
 
-          <div className="flex justify-end space-x-4 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="flex justify-end space-x-2 pt-3">
+            <Button type="button" variant="outline" onClick={onClose} size="sm">
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={articleMutation.isPending}
               className="bg-primary hover:bg-primary/90"
+              size="sm"
             >
               {articleMutation.isPending ? (
                 <div className="loading-dots">
@@ -356,9 +357,9 @@ export function ArticleForm({ article, isOpen, onClose }: ArticleFormProps) {
                   <div></div>
                 </div>
               ) : article ? (
-                "Update Article"
+                "Update"
               ) : (
-                "Add Article"
+                "Add"
               )}
             </Button>
           </div>

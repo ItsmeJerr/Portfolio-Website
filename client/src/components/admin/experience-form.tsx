@@ -177,13 +177,13 @@ export function ExperienceForm({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {experience ? "Edit Experience" : "Add New Experience"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           {/* Upload Multi Gambar Experience */}
           <div className="flex flex-col items-center gap-2">
             <div className="flex flex-wrap gap-2 justify-center mb-2">
@@ -193,19 +193,19 @@ export function ExperienceForm({
                     <img
                       src={img}
                       alt={`Experience ${idx + 1}`}
-                      className="w-20 h-20 object-cover rounded-lg border"
+                      className="w-16 h-16 object-cover rounded-lg border"
                     />
                     <button
                       type="button"
                       onClick={() => removeImage(img)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-80 group-hover:opacity-100"
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-80 group-hover:opacity-100"
                     >
-                      &times;
+                      ×
                     </button>
                   </div>
                 ))
               ) : (
-                <div className="w-24 h-24 rounded-lg bg-muted flex items-center justify-center text-muted-foreground border">
+                <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center text-muted-foreground border text-xs">
                   No Image
                 </div>
               )}
@@ -221,6 +221,7 @@ export function ExperienceForm({
             <Button
               type="button"
               variant="outline"
+              size="sm"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
             >
@@ -228,52 +229,52 @@ export function ExperienceForm({
             </Button>
           </div>
           <div>
-            <Label htmlFor="title">Job Title</Label>
-            <Input id="title" {...register("title")} className="mt-2" />
+            <Label htmlFor="title" className="text-sm">Job Title</Label>
+            <Input id="title" {...register("title")} className="mt-1 h-9" />
             {errors.title && (
-              <p className="text-sm text-destructive mt-1">
+              <p className="text-xs text-destructive mt-1">
                 {errors.title.message}
               </p>
             )}
           </div>
 
           <div>
-            <Label htmlFor="company">Company</Label>
-            <Input id="company" {...register("company")} className="mt-2" />
+            <Label htmlFor="company" className="text-sm">Company</Label>
+            <Input id="company" {...register("company")} className="mt-1 h-9" />
             {errors.company && (
-              <p className="text-sm text-destructive mt-1">
+              <p className="text-xs text-destructive mt-1">
                 {errors.company.message}
               </p>
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label htmlFor="startDate">Start Date</Label>
+              <Label htmlFor="startDate" className="text-sm">Start Date</Label>
               <Input
                 id="startDate"
                 {...register("startDate")}
-                placeholder="e.g., 2022 or Jan 2022"
-                className="mt-2"
+                placeholder="2022 or Jan 2022"
+                className="mt-1 h-9"
               />
               {errors.startDate && (
-                <p className="text-sm text-destructive mt-1">
+                <p className="text-xs text-destructive mt-1">
                   {errors.startDate.message}
                 </p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="endDate">End Date</Label>
+              <Label htmlFor="endDate" className="text-sm">End Date</Label>
               <Input
                 id="endDate"
                 {...register("endDate")}
-                placeholder="e.g., 2023 or Present"
+                placeholder="2023 or Present"
                 disabled={isCurrent}
-                className="mt-2"
+                className="mt-1 h-9"
               />
               {errors.endDate && (
-                <p className="text-sm text-destructive mt-1">
+                <p className="text-xs text-destructive mt-1">
                   {errors.endDate.message}
                 </p>
               )}
@@ -286,45 +287,46 @@ export function ExperienceForm({
               checked={isCurrent}
               onCheckedChange={(checked) => setIsCurrent(checked as boolean)}
             />
-            <Label htmlFor="current">This is my current position</Label>
+            <Label htmlFor="current" className="text-sm">Current position</Label>
           </div>
 
           <div>
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description" className="text-sm">Description</Label>
             <Textarea
               id="description"
-              rows={4}
+              rows={2}
               {...register("description")}
-              className="mt-2 resize-none"
+              className="mt-1 resize-none text-sm"
             />
             {errors.description && (
-              <p className="text-sm text-destructive mt-1">
+              <p className="text-xs text-destructive mt-1">
                 {errors.description.message}
               </p>
             )}
           </div>
 
           <div>
-            <Label htmlFor="technologies">Technologies</Label>
-            <div className="flex space-x-2 mt-2">
+            <Label htmlFor="technologies" className="text-sm">Technologies</Label>
+            <div className="flex space-x-1 mt-1">
               <Input
                 value={techInput}
                 onChange={(e) => setTechInput(e.target.value)}
-                placeholder="Add technology..."
+                placeholder="Add tech..."
                 onKeyPress={(e) =>
                   e.key === "Enter" && (e.preventDefault(), addTechnology())
                 }
+                className="h-9 text-sm"
               />
-              <Button type="button" onClick={addTechnology}>
+              <Button type="button" onClick={addTechnology} size="sm">
                 Add
               </Button>
             </div>
             {technologies.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className="flex flex-wrap gap-1 mt-2">
                 {technologies.map((tech) => (
                   <div
                     key={tech}
-                    className="bg-secondary text-secondary-foreground px-2 py-1 rounded text-sm flex items-center space-x-2"
+                    className="bg-secondary text-secondary-foreground px-2 py-1 rounded text-xs flex items-center space-x-1"
                   >
                     <span>{tech}</span>
                     <button
@@ -340,14 +342,15 @@ export function ExperienceForm({
             )}
           </div>
 
-          <div className="flex justify-end space-x-4 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="flex justify-end space-x-2 pt-3">
+            <Button type="button" variant="outline" onClick={onClose} size="sm">
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={experienceMutation.isPending}
               className="bg-primary hover:bg-primary/90"
+              size="sm"
             >
               {experienceMutation.isPending ? (
                 <div className="loading-dots">
@@ -357,9 +360,9 @@ export function ExperienceForm({
                   <div></div>
                 </div>
               ) : experience ? (
-                "Update Experience"
+                "Update"
               ) : (
-                "Add Experience"
+                "Add"
               )}
             </Button>
           </div>

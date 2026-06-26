@@ -11,6 +11,7 @@ import {
   insertActivitySchema,
   insertArticleSchema,
   insertContactMessageSchema,
+  insertUserSchema,
 } from "@shared/schema";
 import multer from "multer";
 import path from "path";
@@ -57,6 +58,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(profile);
     } catch (error) {
       res.status(400).json({ message: "Invalid profile data" });
+    }
+  });
+
+  app.post("/api/login", async (req, res) => {
+    try {
+      const loginData = insertUserSchema.parse(req.body);
+      const user = await storage.getUserByUsername(loginData.username);
+      if (!user || user.password !== loginData.password) {
+        return res.status(401).json({ message: "Incorrect username or password" });
+      }
+      return res.json({ message: "Login successful" });
+    } catch (error) {
+      if (error instanceof Error && /required/.test(error.message)) {
+        return res.status(400).json({ message: "Username and password are required" });
+      }
+      return res.status(401).json({ message: "Incorrect username or password" });
     }
   });
 

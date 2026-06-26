@@ -1,20 +1,36 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useLocation } from "wouter";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [, setLocation] = useLocation();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Username dan password hardcode untuk admin login
-    if (username === "bintang" && password === "bintang123") {
-      localStorage.setItem("admin_logged_in", "true");
-      setLocation("/admin");
-    } else {
-      setError("Incorrect username or password!");
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.ok) {
+        localStorage.setItem("admin_logged_in", "true");
+        setLocation("/admin");
+      } else {
+        const errorData = await response.json();
+        setError(errorData?.message || "Incorrect username or password!");
+      }
+    } catch (err) {
+      setError("Login failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
