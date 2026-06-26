@@ -62,7 +62,7 @@ async function handleGet(path: string, searchParams: URLSearchParams) {
       return buildResponse(data || []);
     }
     case "experiences": {
-      const { data, error } = await supabase.from("experiences").select("*").order("startDate");
+      const { data, error } = await supabase.from("experiences").select("*").order("start_date");
       if (error) return buildErrorResponse(error.message, 500);
       return buildResponse(normalizeRecords(data || []));
     }
@@ -97,7 +97,7 @@ async function handleGet(path: string, searchParams: URLSearchParams) {
       const { data, error } = await supabase
         .from("contact_messages")
         .select("*")
-        .order("createdAt", { ascending: false });
+        .order("created_at", { ascending: false });
       if (error) return buildErrorResponse(error.message, 500);
       return buildResponse(data || []);
     }
