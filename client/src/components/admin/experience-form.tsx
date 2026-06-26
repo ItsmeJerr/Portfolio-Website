@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, apiUrl } from "@/lib/queryClient";
 import {
   insertExperienceSchema,
   type Experience,
@@ -124,7 +124,7 @@ export function ExperienceForm({
       for (let i = 0; i < files.length; i++) {
         const formData = new FormData();
         formData.append("image", files[i]);
-        const res = await fetch("/api/upload-image", {
+        const res = await fetch(apiUrl("/api/upload-image"), {
           method: "POST",
           body: formData,
         });

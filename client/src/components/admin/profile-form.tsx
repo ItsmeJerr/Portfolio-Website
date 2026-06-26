@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, apiUrl } from "@/lib/queryClient";
 import {
   insertProfileSchema,
   type Profile,
@@ -79,7 +79,7 @@ export function ProfileForm({ profile, isLoading }: ProfileFormProps) {
     formData.append("image", file);
     setUploading(true);
     try {
-      const res = await fetch("/api/upload-image", {
+      const res = await fetch(apiUrl("/api/upload-image"), {
         method: "POST",
         body: formData,
       });

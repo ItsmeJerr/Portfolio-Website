@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/mysql2";
-import mysql from "mysql2/promise";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import { eq, and } from "drizzle-orm";
 import {
   users,
@@ -31,28 +31,22 @@ import {
   type InsertContactMessage,
 } from "@shared/schema";
 
-export class MySQLStorage {
+export class PostgresStorage {
   private db: ReturnType<typeof drizzle>;
 
   constructor() {
-    // Parse connection string
     const connectionString =
       process.env.DATABASE_URL ||
-      "mysql://root:010304@localhost:3306/portfolio_db";
-    const url = new URL(connectionString);
+      "postgres://postgres:password@localhost:5432/portfolio_db";
 
-    const pool = mysql.createPool({
-      host: url.hostname,
-      port: parseInt(url.port) || 3306,
-      user: url.username,
-      password: url.password,
-      database: url.pathname.slice(1), // Remove leading slash
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
+    const sql = postgres(connectionString, {
+      ssl:
+        process.env.NODE_ENV === "production"
+          ? { rejectUnauthorized: false }
+          : false,
     });
 
-    this.db = drizzle(pool);
+    this.db = drizzle(sql);
   }
 
   // Profile methods
@@ -70,17 +64,13 @@ export class MySQLStorage {
         .where(eq(profile.id, existingProfile.id));
       const updated = await this.getProfile();
       return updated!;
-    } else {
-      const insertResult = await this.db
-        .insert(profile)
-        .values(profileData)
-        .$returningId();
-      const inserted = await this.db
-        .select()
-        .from(profile)
-        .where(eq(profile.id, insertResult.insertId));
-      return inserted[0];
     }
+
+    const [inserted] = await this.db
+      .insert(profile)
+      .values(profileData)
+      .returning();
+    return inserted;
   }
 
   // Skills methods
@@ -89,15 +79,11 @@ export class MySQLStorage {
   }
 
   async createSkill(skill: InsertSkill): Promise<Skill> {
-    const insertResult = await this.db
+    const [inserted] = await this.db
       .insert(skills)
       .values(skill)
-      .$returningId();
-    const inserted = await this.db
-      .select()
-      .from(skills)
-      .where(eq(skills.id, insertResult.insertId));
-    return inserted[0];
+      .returning();
+    return inserted;
   }
 
   async updateSkill(
@@ -114,7 +100,7 @@ export class MySQLStorage {
 
   async deleteSkill(id: number): Promise<boolean> {
     const result = await this.db.delete(skills).where(eq(skills.id, id));
-    return result.affectedRows > 0;
+    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
   }
 
   // Experience methods
@@ -123,7 +109,6 @@ export class MySQLStorage {
       .select()
       .from(experiences)
       .orderBy(experiences.startDate);
-    // Parse images JSON ke array
     return result.map((exp) => ({
       ...exp,
       images:
@@ -136,7 +121,6 @@ export class MySQLStorage {
   }
 
   async createExperience(experience: InsertExperience): Promise<Experience> {
-    // Pastikan images selalu string JSON
     const expToSave = {
       ...experience,
       images:
@@ -144,21 +128,17 @@ export class MySQLStorage {
           ? experience.images
           : JSON.stringify(experience.images || []),
     };
-    const insertResult = await this.db
+    const [inserted] = await this.db
       .insert(experiences)
       .values(expToSave)
-      .$returningId();
-    const inserted = await this.db
-      .select()
-      .from(experiences)
-      .where(eq(experiences.id, insertResult.insertId));
+      .returning();
     return {
-      ...inserted[0],
+      ...inserted,
       images:
-        inserted[0].images &&
-        typeof inserted[0].images === "string" &&
-        inserted[0].images.trim().startsWith("[")
-          ? JSON.parse(inserted[0].images)
+        inserted.images &&
+        typeof inserted.images === "string" &&
+        inserted.images.trim().startsWith("[")
+          ? JSON.parse(inserted.images)
           : [],
     };
   }
@@ -167,7 +147,6 @@ export class MySQLStorage {
     id: number,
     experience: Partial<InsertExperience>
   ): Promise<Experience | undefined> {
-    // Pastikan images selalu string JSON
     const expToSave = {
       ...experience,
       images:
@@ -200,7 +179,7 @@ export class MySQLStorage {
     const result = await this.db
       .delete(experiences)
       .where(eq(experiences.id, id));
-    return result.affectedRows > 0;
+    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
   }
 
   // Education methods
@@ -209,15 +188,11 @@ export class MySQLStorage {
   }
 
   async createEducation(educationData: InsertEducation): Promise<Education> {
-    const insertResult = await this.db
+    const [inserted] = await this.db
       .insert(education)
       .values(educationData)
-      .$returningId();
-    const inserted = await this.db
-      .select()
-      .from(education)
-      .where(eq(education.id, insertResult.insertId));
-    return inserted[0];
+      .returning();
+    return inserted;
   }
 
   async updateEducation(
@@ -237,7 +212,7 @@ export class MySQLStorage {
 
   async deleteEducation(id: number): Promise<boolean> {
     const result = await this.db.delete(education).where(eq(education.id, id));
-    return result.affectedRows > 0;
+    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
   }
 
   // Certification methods
@@ -251,15 +226,11 @@ export class MySQLStorage {
   async createCertification(
     certification: InsertCertification
   ): Promise<Certification> {
-    const insertResult = await this.db
+    const [inserted] = await this.db
       .insert(certifications)
       .values(certification)
-      .$returningId();
-    const inserted = await this.db
-      .select()
-      .from(certifications)
-      .where(eq(certifications.id, insertResult.insertId));
-    return inserted[0];
+      .returning();
+    return inserted;
   }
 
   async updateCertification(
@@ -281,7 +252,7 @@ export class MySQLStorage {
     const result = await this.db
       .delete(certifications)
       .where(eq(certifications.id, id));
-    return result.affectedRows > 0;
+    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
   }
 
   // Activity methods
@@ -290,15 +261,11 @@ export class MySQLStorage {
   }
 
   async createActivity(activity: InsertActivity): Promise<Activity> {
-    const insertResult = await this.db
+    const [inserted] = await this.db
       .insert(activities)
       .values(activity)
-      .$returningId();
-    const inserted = await this.db
-      .select()
-      .from(activities)
-      .where(eq(activities.id, insertResult.insertId));
-    return inserted[0];
+      .returning();
+    return inserted;
   }
 
   async updateActivity(
@@ -317,7 +284,7 @@ export class MySQLStorage {
     const result = await this.db
       .delete(activities)
       .where(eq(activities.id, id));
-    return result.affectedRows > 0;
+    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
   }
 
   // Article methods
@@ -351,15 +318,11 @@ export class MySQLStorage {
   }
 
   async createArticle(article: InsertArticle): Promise<Article> {
-    const insertResult = await this.db
+    const [inserted] = await this.db
       .insert(articles)
       .values(article)
-      .$returningId();
-    const inserted = await this.db
-      .select()
-      .from(articles)
-      .where(eq(articles.id, insertResult.insertId));
-    return inserted[0];
+      .returning();
+    return inserted;
   }
 
   async updateArticle(
@@ -376,7 +339,7 @@ export class MySQLStorage {
 
   async deleteArticle(id: number): Promise<boolean> {
     const result = await this.db.delete(articles).where(eq(articles.id, id));
-    return result.affectedRows > 0;
+    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
   }
 
   // Contact message methods
@@ -390,15 +353,11 @@ export class MySQLStorage {
   async createContactMessage(
     message: InsertContactMessage
   ): Promise<ContactMessage> {
-    const insertResult = await this.db
+    const [inserted] = await this.db
       .insert(contactMessages)
       .values(message)
-      .$returningId();
-    const inserted = await this.db
-      .select()
-      .from(contactMessages)
-      .where(eq(contactMessages.id, insertResult.insertId));
-    return inserted[0];
+      .returning();
+    return inserted;
   }
 
   async markMessageAsRead(id: number): Promise<boolean> {
@@ -413,7 +372,7 @@ export class MySQLStorage {
     const result = await this.db
       .delete(contactMessages)
       .where(eq(contactMessages.id, id));
-    return result.affectedRows > 0;
+    return (result?.rowCount ?? result?.affectedRows ?? 0) > 0;
   }
 
   // User methods
@@ -436,9 +395,9 @@ export class MySQLStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const result = await this.db.insert(users).values(insertUser).returning();
-    return result[0];
+    const [inserted] = await this.db.insert(users).values(insertUser).returning();
+    return inserted;
   }
 }
 
-export const storage = new MySQLStorage();
+export const storage = new PostgresStorage();

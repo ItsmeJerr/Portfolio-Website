@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, apiUrl } from "@/lib/queryClient";
 import {
   insertArticleSchema,
   type Article,
@@ -153,7 +153,7 @@ export function ArticleForm({ article, isOpen, onClose }: ArticleFormProps) {
     const formData = new FormData();
     formData.append("image", file);
     try {
-      const res = await fetch("/api/upload-image", {
+      const res = await fetch(apiUrl("/api/upload-image"), {
         method: "POST",
         body: formData,
       });

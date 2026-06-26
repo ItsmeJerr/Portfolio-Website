@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, apiUrl } from "@/lib/queryClient";
 import {
   insertActivitySchema,
   type Activity,
@@ -107,7 +107,7 @@ export function ActivityForm({ activity, isOpen, onClose }: ActivityFormProps) {
     const formData = new FormData();
     formData.append("image", file);
     try {
-      const res = await fetch("/api/upload-image", {
+      const res = await fetch(apiUrl("/api/upload-image"), {
         method: "POST",
         body: formData,
       });
