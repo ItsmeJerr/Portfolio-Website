@@ -24,6 +24,8 @@ function parseUrl(url: string) {
 }
 
 function normalizeRecord(record: any) {
+  if (!record) return record;
+
   if (record?.images && typeof record.images === "string") {
     try {
       record.images = JSON.parse(record.images);
@@ -31,6 +33,32 @@ function normalizeRecord(record: any) {
       record.images = [];
     }
   }
+
+  if (record.full_name !== undefined) {
+    record.fullName = record.full_name;
+  }
+  if (record.linkedin_url !== undefined) {
+    record.linkedinUrl = record.linkedin_url;
+  }
+  if (record.github_url !== undefined) {
+    record.githubUrl = record.github_url;
+  }
+  if (record.twitter_url !== undefined) {
+    record.twitterUrl = record.twitter_url;
+  }
+  if (record.instagram_url !== undefined) {
+    record.instagramUrl = record.instagram_url;
+  }
+  if (record.youtube_url !== undefined) {
+    record.youtubeUrl = record.youtube_url;
+  }
+  if (record.created_at !== undefined) {
+    record.createdAt = record.created_at;
+  }
+  if (record.updated_at !== undefined) {
+    record.updatedAt = record.updated_at;
+  }
+
   return record;
 }
 
@@ -40,12 +68,68 @@ function normalizeRecords(records: any[]) {
 
 function preparePayload(path: string, payload: any) {
   const table = path.split("/")[0];
-  if (table === "experiences" && payload?.images) {
-    if (Array.isArray(payload.images)) {
-      payload.images = JSON.stringify(payload.images);
+  const mappedPayload = { ...(payload ?? {}) };
+
+  const mapFields = (mapping: Record<string, string>) => {
+    for (const [camelCaseKey, snakeCaseKey] of Object.entries(mapping)) {
+      if (mappedPayload[camelCaseKey] !== undefined && mappedPayload[snakeCaseKey] === undefined) {
+        mappedPayload[snakeCaseKey] = mappedPayload[camelCaseKey];
+      }
+      delete mappedPayload[camelCaseKey];
+    }
+  };
+
+  if (table === "profile") {
+    mapFields({
+      fullName: "full_name",
+      linkedinUrl: "linkedin_url",
+      githubUrl: "github_url",
+      twitterUrl: "twitter_url",
+      instagramUrl: "instagram_url",
+      youtubeUrl: "youtube_url",
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    });
+  }
+
+  if (table === "experiences") {
+    mapFields({
+      startDate: "start_date",
+      endDate: "end_date",
+      createdAt: "created_at",
+    });
+  }
+
+  if (table === "certifications") {
+    mapFields({
+      credentialUrl: "credential_url",
+      createdAt: "created_at",
+    });
+  }
+
+  if (table === "education") {
+    mapFields({ createdAt: "created_at" });
+  }
+
+  if (table === "activities") {
+    mapFields({ createdAt: "created_at" });
+  }
+
+  if (table === "articles") {
+    mapFields({ createdAt: "created_at", updatedAt: "updated_at" });
+  }
+
+  if (table === "contact-messages") {
+    mapFields({ isRead: "is_read", createdAt: "created_at" });
+  }
+
+  if (table === "experiences" && mappedPayload?.images) {
+    if (Array.isArray(mappedPayload.images)) {
+      mappedPayload.images = JSON.stringify(mappedPayload.images);
     }
   }
-  return payload;
+
+  return mappedPayload;
 }
 
 async function handleGet(path: string, searchParams: URLSearchParams) {
@@ -54,7 +138,7 @@ async function handleGet(path: string, searchParams: URLSearchParams) {
     case "profile": {
       const { data, error } = await supabase.from("profile").select("*").limit(1).maybeSingle();
       if (error) return buildErrorResponse(error.message, 500);
-      return buildResponse(data || null);
+      return buildResponse(data ? normalizeRecord(data) : null);
     }
     case "skills": {
       const { data, error } = await supabase.from("skills").select("*").order("proficiency");
