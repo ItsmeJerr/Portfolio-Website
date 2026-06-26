@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { getTailwindColorClasses } from "@/lib/utils";
 import {
   Mail,
   Phone,
@@ -209,11 +210,12 @@ export default function Contact() {
                 <div className="flex space-x-4">
                   {socialLinks.map((social) => {
                     const Icon = social.icon;
+                    const socialColor = getTailwindColorClasses(social.color);
                     return (
                       <Button
                         key={social.label}
                         size="icon"
-                        className={`bg-${social.color}-600 hover:bg-${social.color}-700 text-white`}
+                        className={`${socialColor.bg} ${socialColor.hover} text-white`}
                         asChild
                       >
                         <a

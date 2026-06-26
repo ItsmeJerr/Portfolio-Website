@@ -25,6 +25,7 @@ import type {
   Activity,
 } from "@lib/types";
 import { getSkillCategoryConfig } from "@/lib/types";
+import { getTailwindColorClasses } from "@/lib/utils";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { useState } from "react";
 
@@ -290,13 +291,18 @@ export default function Home() {
                   >
                     <CardContent className="p-6">
                       <div className="mb-4">
-                        <div
-                          className={`bg-${config.color}-100 dark:bg-${config.color}-900/20 p-3 rounded-lg w-fit`}
-                        >
-                          <i
-                            className={`${config.icon} text-${config.color}-600 text-xl`}
-                          />
-                        </div>
+                        {(() => {
+                          const colorClasses = getTailwindColorClasses(config.color);
+                          return (
+                            <div
+                              className={`${colorClasses.bg} p-3 rounded-lg w-fit`}
+                            >
+                              <i
+                                className={`${config.icon} ${colorClasses.text} text-xl`}
+                              />
+                            </div>
+                          );
+                        })()}
                       </div>
                       <h3 className="font-semibold text-foreground mb-2">
                         {skill.name}
@@ -573,13 +579,18 @@ export default function Home() {
                         onClick={() => setPreviewImg(activity.image)}
                       />
                     ) : (
-                      <div
-                        className={`bg-${activity.color}-100 dark:bg-${activity.color}-900/20 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center`}
-                      >
-                        <i
-                          className={`${activity.icon} text-${activity.color}-600 text-xl`}
-                        />
-                      </div>
+                      {(() => {
+                        const activityColor = getTailwindColorClasses(activity.color);
+                        return (
+                          <div
+                            className={`${activityColor.bg} p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center`}
+                          >
+                            <i
+                              className={`${activity.icon} ${activityColor.text} text-xl`}
+                            />
+                          </div>
+                        );
+                      })()}
                     )}
                     <h3 className="font-semibold text-foreground mb-2">
                       {activity.title}

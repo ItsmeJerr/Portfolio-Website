@@ -766,10 +766,10 @@ export default function Admin() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             <TabsTrigger
               value="profile"
-              className="flex items-center space-x-2"
+              className="flex items-center justify-center space-x-2"
             >
               <User className="h-4 w-4" />
               <span className="hidden sm:inline">Profile</span>
