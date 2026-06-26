@@ -1,11 +1,11 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 
-// Base API URL for admin mutations. Use VITE_API_URL in production (Vercel),
-// fallback to localhost for local development.
-const API_BASE = (import.meta.env.VITE_API_URL as string) || "http://localhost:3000";
-
 const SUPABASE_DATE_FIELDS = ["createdAt", "updatedAt"];
+
+const API_BASE = (import.meta.env.VITE_API_URL as string | undefined)
+  ?.replace(/\/$/, "")
+  .trim();
 
 function buildResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -194,25 +194,122 @@ async function handleGet(path: string, searchParams: URLSearchParams) {
   }
 }
 
+async function handleAdminResourcePost(path: string, body: any) {
+  const payload = preparePayload(path, body);
+  const table = path.split("/")[0];
+
+  switch (table) {
+    case "experiences":
+      return await handleSupabaseInsert("experiences", payload);
+    case "skills":
+      return await handleSupabaseInsert("skills", payload);
+    case "education":
+      return await handleSupabaseInsert("education", payload);
+    case "certifications":
+      return await handleSupabaseInsert("certifications", payload);
+    case "activities":
+      return await handleSupabaseInsert("activities", payload);
+    case "articles":
+      return await handleSupabaseInsert("articles", payload);
+    default:
+      return buildErrorResponse(`Unknown POST path ${path}`, 404);
+  }
+}
+
+async function handleAdminResourcePut(path: string, body: any) {
+  const payload = preparePayload(path, body);
+  const table = path.split("/")[0];
+  const idMatch = path.match(/\/(\d+)$/);
+  const id = idMatch ? Number(idMatch[1]) : undefined;
+
+  if (!id) {
+    return buildErrorResponse("Missing id for update", 400);
+  }
+
+  switch (table) {
+    case "experiences":
+      return await handleSupabaseUpdate("experiences", id, payload);
+    case "skills":
+      return await handleSupabaseUpdate("skills", id, payload);
+    case "education":
+      return await handleSupabaseUpdate("education", id, payload);
+    case "certifications":
+      return await handleSupabaseUpdate("certifications", id, payload);
+    case "activities":
+      return await handleSupabaseUpdate("activities", id, payload);
+    case "articles":
+      return await handleSupabaseUpdate("articles", id, payload);
+    default:
+      return buildErrorResponse(`Unknown PUT path ${path}`, 404);
+  }
+}
+
+async function handleAdminResourceDelete(path: string) {
+  const table = path.split("/")[0];
+  const idMatch = path.match(/\/(\d+)$/);
+  const id = idMatch ? Number(idMatch[1]) : undefined;
+
+  if (!id) {
+    return buildErrorResponse("Missing id for delete", 400);
+  }
+
+  switch (table) {
+    case "experiences":
+      return await handleSupabaseDelete("experiences", id);
+    case "skills":
+      return await handleSupabaseDelete("skills", id);
+    case "education":
+      return await handleSupabaseDelete("education", id);
+    case "certifications":
+      return await handleSupabaseDelete("certifications", id);
+    case "activities":
+      return await handleSupabaseDelete("activities", id);
+    case "articles":
+      return await handleSupabaseDelete("articles", id);
+    default:
+      return buildErrorResponse(`Unknown DELETE path ${path}`, 404);
+  }
+}
+
+async function handleSupabaseInsert(table: string, payload: any) {
+  const { data, error } = await supabase.from(table).insert(payload).select("*");
+  if (error) return buildErrorResponse(error.message, 500);
+  return buildResponse(data?.[0] ?? null, 201);
+}
+
+async function handleSupabaseUpdate(table: string, id: number, payload: any) {
+  const { data, error } = await supabase.from(table).update(payload).eq("id", id).select("*");
+  if (error) return buildErrorResponse(error.message, 500);
+  return buildResponse(data?.[0] ?? null);
+}
+
+async function handleSupabaseDelete(table: string, id: number) {
+  const { data, error } = await supabase.from(table).delete().eq("id", id).select("*");
+  if (error) return buildErrorResponse(error.message, 500);
+  return buildResponse(data?.[0] ?? null);
+}
+
 async function handlePost(path: string, body: any) {
   const table = path.split("/")[0];
-  
-  // Route through Express API for admin data operations
+
   if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
-    try {
-      const response = await fetch(`${API_BASE}/api/${path}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        return buildErrorResponse(data?.message || "Creation failed", response.status);
+    if (API_BASE) {
+      try {
+        const response = await fetch(`${API_BASE}/api/${path}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          return buildErrorResponse(data?.message || "Creation failed", response.status);
+        }
+        return buildResponse(data, 201);
+      } catch (err: any) {
+        return buildErrorResponse(err?.message || "POST request failed", 500);
       }
-      return buildResponse(data, 201);
-    } catch (err: any) {
-      return buildErrorResponse(err?.message || "POST request failed", 500);
     }
+    return handleAdminResourcePost(path, body);
   }
 
   switch (table) {
@@ -264,20 +361,23 @@ async function handlePut(path: string, body: any) {
 
   // Route through Express API for experiences, skills, and other admin data
   if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
-    try {
-      const response = await fetch(`${API_BASE}/api/${path}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        return buildErrorResponse(data?.message || "Update failed", response.status);
+    if (API_BASE) {
+      try {
+        const response = await fetch(`${API_BASE}/api/${path}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          return buildErrorResponse(data?.message || "Update failed", response.status);
+        }
+        return buildResponse(data);
+      } catch (err: any) {
+        return buildErrorResponse(err?.message || "Update request failed", 500);
       }
-      return buildResponse(data);
-    } catch (err: any) {
-      return buildErrorResponse(err?.message || "Update request failed", 500);
     }
+    return handleAdminResourcePut(path, body);
   }
 
   const idMatch = path.match(/\/(\d+)$/);
@@ -331,21 +431,23 @@ async function handleDelete(path: string) {
     return buildErrorResponse("Missing id for delete", 400);
   }
   
-  // Route through Express API for admin data
   if (["experiences", "skills", "education", "certifications", "articles", "activities"].includes(table)) {
-    try {
-      const response = await fetch(`${API_BASE}/api/${path}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        return buildErrorResponse(data?.message || "Delete failed", response.status);
+    if (API_BASE) {
+      try {
+        const response = await fetch(`${API_BASE}/api/${path}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          return buildErrorResponse(data?.message || "Delete failed", response.status);
+        }
+        return buildResponse(data);
+      } catch (err: any) {
+        return buildErrorResponse(err?.message || "DELETE request failed", 500);
       }
-      return buildResponse(data);
-    } catch (err: any) {
-      return buildErrorResponse(err?.message || "DELETE request failed", 500);
     }
+    return handleAdminResourceDelete(path);
   }
   
   const { data, error } = await supabase.from(table).delete().eq("id", id).select("*");
