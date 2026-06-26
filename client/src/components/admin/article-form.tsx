@@ -20,7 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, apiUrl } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
+import { uploadImage } from "@/lib/supabaseClient";
 import {
   insertArticleSchema,
   type Article,
@@ -153,22 +154,10 @@ export function ArticleForm({ article, isOpen, onClose }: ArticleFormProps) {
     const formData = new FormData();
     formData.append("image", file);
     try {
-      const res = await fetch(apiUrl("/api/upload-image"), {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.url) {
-        setImageUrl(data.url);
-        setValue("imageUrl", data.url, { shouldValidate: true });
-      } else {
-        toast({
-          title: "Upload failed",
-          description: data.message || "Failed to upload image",
-          variant: "destructive",
-        });
-      }
-    } catch (err) {
+      const url = await uploadImage(file);
+      setImageUrl(url);
+      setValue("imageUrl", url, { shouldValidate: true });
+    } catch (err: any) {
       toast({
         title: "Upload failed",
         description: "Failed to upload image",

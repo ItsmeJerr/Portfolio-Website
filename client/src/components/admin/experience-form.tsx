@@ -13,7 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, apiUrl } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
+import { uploadImage } from "@/lib/supabaseClient";
 import {
   insertExperienceSchema,
   type Experience,
@@ -122,23 +123,16 @@ export function ExperienceForm({
     try {
       const uploaded: string[] = [];
       for (let i = 0; i < files.length; i++) {
-        const formData = new FormData();
-        formData.append("image", files[i]);
-        const res = await fetch(apiUrl("/api/upload-image"), {
-          method: "POST",
-          body: formData,
-        });
-        if (!res.ok) {
-          const err = await res.json();
+        try {
+          const url = await uploadImage(files[i]);
+          uploaded.push(url);
+        } catch (err: any) {
           toast({
             title: "Upload failed",
-            description: err.message || "Failed to upload image.",
+            description: err?.message || "Failed to upload image.",
             variant: "destructive",
           });
-          continue;
         }
-        const data = await res.json();
-        if (data.url) uploaded.push(data.url);
       }
       setImages((prev) => [...prev, ...uploaded]);
       if (uploaded.length > 0) {

@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, apiUrl } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
+import { uploadImage } from "@/lib/supabaseClient";
 import {
   insertProfileSchema,
   type Profile,
@@ -79,29 +80,14 @@ export function ProfileForm({ profile, isLoading }: ProfileFormProps) {
     formData.append("image", file);
     setUploading(true);
     try {
-      const res = await fetch(apiUrl("/api/upload-image"), {
-        method: "POST",
-        body: formData,
+      const url = await uploadImage(file);
+      setImageUrl(url);
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully.",
+        variant: "success",
       });
-      if (!res.ok) {
-        const err = await res.json();
-        toast({
-          title: "Upload failed",
-          description: err.message || "Failed to upload image.",
-          variant: "destructive",
-        });
-        return;
-      }
-      const data = await res.json();
-      if (data.url) {
-        setImageUrl(data.url);
-        toast({
-          title: "Success",
-          description: "Image uploaded successfully.",
-          variant: "success",
-        });
-      }
-    } catch (err) {
+    } catch (err: any) {
       toast({
         title: "Error",
         description: "An error occurred while uploading the image.",

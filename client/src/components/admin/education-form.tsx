@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, apiUrl } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";
+import { uploadImage } from "@/lib/supabaseClient";
 import {
   insertEducationSchema,
   type Education,
@@ -117,22 +118,10 @@ export function EducationForm({
     const formData = new FormData();
     formData.append("image", file);
     try {
-      const res = await fetch(apiUrl("/api/upload-image"), {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.url) {
-        setImageUrl(data.url);
-        setValue("image", data.url as any, { shouldValidate: true });
-      } else {
-        toast({
-          title: "Upload failed",
-          description: data.message || "Failed to upload image",
-          variant: "destructive",
-        });
-      }
-    } catch (err) {
+      const url = await uploadImage(file);
+      setImageUrl(url);
+      setValue("image", url as any, { shouldValidate: true });
+    } catch (err: any) {
       toast({
         title: "Upload failed",
         description: "Failed to upload image",
