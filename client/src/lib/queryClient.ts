@@ -77,6 +77,12 @@ function normalizeRecord(record: any) {
   if (record.end_date !== undefined) {
     record.endDate = record.end_date;
   }
+  if (record.read_time !== undefined) {
+    record.readTime = record.read_time;
+  }
+  if (record.image_url !== undefined) {
+    record.imageUrl = record.image_url;
+  }
 
   return record;
 }
@@ -135,7 +141,12 @@ function preparePayload(path: string, payload: any) {
   }
 
   if (table === "articles") {
-    mapFields({ createdAt: "created_at", updatedAt: "updated_at" });
+    mapFields({
+      readTime: "read_time",
+      imageUrl: "image_url",
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    });
   }
 
   if (table === "contact-messages") {
