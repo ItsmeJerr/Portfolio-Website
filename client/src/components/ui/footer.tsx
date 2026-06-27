@@ -1,7 +1,12 @@
-import { Instagram, Github, Youtube } from "lucide-react";
-import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { Instagram, Github, Youtube, Linkedin } from "lucide-react";
+import type { Profile } from "@/lib/types";
 
 export function Footer() {
+  const { data: profile } = useQuery<Profile>({
+    queryKey: ["/api/profile"],
+  });
+
   return (
     <footer className="w-full border-t border-border bg-background/80 py-6 mt-16">
       <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -9,6 +14,17 @@ export function Footer() {
           &copy; {new Date().getFullYear()} mbalffajry. All rights reserved.
         </div>
         <div className="flex gap-4">
+          {profile?.linkedinUrl && (
+            <a
+              href={profile.linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              className="hover:text-primary transition-colors"
+            >
+              <Linkedin className="w-5 h-5" />
+            </a>
+          )}
           <a
             href="https://instagram.com/mbalffa.jry"
             target="_blank"

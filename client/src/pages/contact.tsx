@@ -66,27 +66,6 @@ const values = [
   },
 ];
 
-const socialLinks = [
-  {
-    icon: Youtube,
-    href: "https://youtube.com/@mbalffajry",
-    label: "YouTube",
-    color: "red",
-  },
-  {
-    icon: Instagram,
-    href: "https://instagram.com/mbalffa.jry",
-    label: "Instagram",
-    color: "pink",
-  },
-  {
-    icon: Github,
-    href: "https://github.com/ItsmeJerr",
-    label: "GitHub",
-    color: "slate",
-  },
-];
-
 export default function Contact() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -96,6 +75,33 @@ export default function Contact() {
   const { data: profile } = useQuery<Profile>({
     queryKey: ["/api/profile"],
   });
+
+  const socialLinks = [
+    {
+      icon: Linkedin,
+      href: profile?.linkedinUrl || "",
+      label: "LinkedIn",
+      color: "blue",
+    },
+    {
+      icon: Youtube,
+      href: "https://youtube.com/@mbalffajry",
+      label: "YouTube",
+      color: "red",
+    },
+    {
+      icon: Instagram,
+      href: "https://instagram.com/mbalffa.jry",
+      label: "Instagram",
+      color: "pink",
+    },
+    {
+      icon: Github,
+      href: "https://github.com/ItsmeJerr",
+      label: "GitHub",
+      color: "slate",
+    },
+    ].filter((social) => social.href);
 
   const {
     register,
