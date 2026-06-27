@@ -236,7 +236,23 @@ async function handleGet(path: string, searchParams: URLSearchParams) {
       if (error) return buildErrorResponse(error.message, 500);
       return buildResponse(normalizeRecords(data || []));
     }
-    case "contact-messages": {
+    case "contact-messages": {      if (typeof window !== "undefined") {
+        const backendPath = API_BASE ? `${API_BASE}/api/${path}` : `/api/${path}`;
+        try {
+          const response = await fetch(backendPath);
+          if (!response.ok) {
+            const errorData = await response.text();
+            return buildErrorResponse(
+              errorData || `Failed to fetch ${path}`,
+              response.status
+            );
+          }
+          const data = await response.json();
+          return buildResponse(data || []);
+        } catch (err) {
+          console.warn("Backend fetch for contact messages failed, falling back to Supabase.", err);
+        }
+      }
       const { data, error } = await supabase
         .from("contact_messages")
         .select("*")
