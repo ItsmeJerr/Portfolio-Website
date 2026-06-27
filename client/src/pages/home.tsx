@@ -16,6 +16,12 @@ import {
   Heart,
   ExternalLink,
   Download,
+  Code,
+  Server,
+  Palette,
+  Cloud,
+  Smartphone,
+  Users,
 } from "lucide-react";
 import type {
   Profile,
@@ -300,12 +306,21 @@ export default function Home() {
                       <div className="mb-4">
                         {(() => {
                           const colorClasses = getTailwindColorClasses(config.color);
+                          const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+                            "fas fa-code": Code,
+                            "fas fa-server": Server,
+                            "fas fa-palette": Palette,
+                            "fas fa-cloud": Cloud,
+                            "fas fa-mobile-alt": Smartphone,
+                            "fas fa-users": Users,
+                          };
+                          const IconComponent = iconMap[config.icon] || Code;
                           return (
                             <div
                               className={`${colorClasses.bg} p-3 rounded-lg w-fit`}
                             >
-                              <i
-                                className={`${config.icon} ${colorClasses.text} text-xl`}
+                              <IconComponent
+                                className={`${colorClasses.text} w-5 h-5`}
                               />
                             </div>
                           );
