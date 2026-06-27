@@ -196,6 +196,21 @@ async function handleGet(path: string, searchParams: URLSearchParams) {
       return buildResponse(data || []);
     }
     case "articles": {
+      // Check if fetching single article by slug
+      const slugMatch = path.match(/^articles\/([^/]+)$/);
+      if (slugMatch) {
+        const slug = slugMatch[1];
+        const { data, error } = await supabase
+          .from("articles")
+          .select("*")
+          .eq("slug", slug)
+          .limit(1)
+          .maybeSingle();
+        if (error) return buildErrorResponse(error.message, 500);
+        return buildResponse(data ? normalizeRecord(data) : null);
+      }
+
+      // Fetch multiple articles with optional filters
       let query = supabase.from("articles").select("*");
       if (searchParams.get("published") === "true") {
         query = query.eq("published", true);
@@ -205,7 +220,7 @@ async function handleGet(path: string, searchParams: URLSearchParams) {
       }
       const { data, error } = await query;
       if (error) return buildErrorResponse(error.message, 500);
-      return buildResponse(data || []);
+      return buildResponse(normalizeRecords(data || []));
     }
     case "contact-messages": {
       const { data, error } = await supabase

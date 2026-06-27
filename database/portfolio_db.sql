@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS articles (
     title VARCHAR(200) NOT NULL,
     slug VARCHAR(200) NOT NULL UNIQUE,
     excerpt VARCHAR(1000) NOT NULL,
-    content VARCHAR(4000) NOT NULL,
+    content LONGTEXT NOT NULL,
     category VARCHAR(100) NOT NULL,
     read_time INT NOT NULL,
     image_url VARCHAR(255) NULL,
