@@ -83,6 +83,15 @@ function normalizeRecord(record: any) {
   if (record.image_url !== undefined) {
     record.imageUrl = record.image_url;
   }
+  if (record.first_name !== undefined) {
+    record.firstName = record.first_name;
+  }
+  if (record.last_name !== undefined) {
+    record.lastName = record.last_name;
+  }
+  if (record.is_read !== undefined) {
+    record.isRead = record.is_read;
+  }
 
   return record;
 }
@@ -150,7 +159,12 @@ function preparePayload(path: string, payload: any) {
   }
 
   if (table === "contact-messages") {
-    mapFields({ isRead: "is_read", createdAt: "created_at" });
+    mapFields({
+      firstName: "first_name",
+      lastName: "last_name",
+      isRead: "is_read",
+      createdAt: "created_at",
+    });
   }
 
   if (table === "experiences" && mappedPayload?.images) {
@@ -228,7 +242,7 @@ async function handleGet(path: string, searchParams: URLSearchParams) {
         .select("*")
         .order("created_at", { ascending: false });
       if (error) return buildErrorResponse(error.message, 500);
-      return buildResponse(data || []);
+      return buildResponse(normalizeRecords(data || []));
     }
     default:
       return buildErrorResponse(`Unknown GET path ${path}`, 404);
@@ -376,7 +390,27 @@ async function handlePost(path: string, body: any) {
       return buildResponse(data?.[0] ?? null, 201);
     }
     case "contact-messages": {
-      const { data, error } = await supabase.from("contact_messages").insert(body).select("*");
+      const payload = preparePayload(path, body);
+      const backendPath = API_BASE ? `${API_BASE}/api/${path}` : `/api/${path}`;
+
+      if (typeof window !== "undefined") {
+        try {
+          const response = await fetch(backendPath, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const responseData = await response.json();
+          if (response.ok) {
+            return buildResponse(responseData?.data ?? responseData, response.status);
+          }
+          return buildErrorResponse(responseData?.message || "Failed to send contact message", response.status);
+        } catch (err) {
+          console.warn("Contact message backend request failed, falling back to direct Supabase insert.", err);
+        }
+      }
+
+      const { data, error } = await supabase.from("contact_messages").insert(payload).select("*");
       if (error) return buildErrorResponse(error.message, 500);
       return buildResponse(data?.[0] ?? null, 201);
     }
