@@ -475,39 +475,65 @@ export default function Home() {
               systems.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Formal Education */}
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="bg-primary/10 p-3 rounded-lg mr-4">
-                    <GraduationCap className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-foreground">
-                      {education[0]?.degree || "Computer Science"}
-                    </h3>
-                    <p className="text-accent font-medium">
-                      {education[0]?.institution || "University of Indonesia"}
+          <div className="grid lg:grid-cols-2 gap-8">
+            {educationLoading ? (
+              Array.from({ length: 2 }).map((_, index) => (
+                <Card key={index}>
+                  <CardContent className="p-6">
+                    <Skeleton className="h-8 w-3/4 mb-4" />
+                    <Skeleton className="h-5 w-1/2 mb-4" />
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-5/6" />
+                  </CardContent>
+                </Card>
+              ))
+            ) : education.length > 0 ? (
+              education.map((edu) => (
+                <Card key={edu.id}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="bg-primary/10 p-3 rounded-lg mr-4">
+                        <GraduationCap className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold text-foreground">
+                          {edu.degree}
+                        </h3>
+                        <p className="text-accent font-medium">
+                          {edu.institution}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-muted-foreground mb-2">
+                      {edu.year}
                     </p>
-                  </div>
-                </div>
-                <p className="text-muted-foreground mb-2">
-                  {education[0]?.year || "2015 - 2019"}
-                </p>
-                <p className="text-muted-foreground text-sm">
-                  {education[0]?.description ||
-                    "Focused on software engineering, data structures, algorithms, and web development. Final project: E-commerce platform with AI recommendations."}
-                </p>
-                {education[0]?.gpa && (
-                  <p className="text-sm text-muted-foreground mt-2">
-                    GPA: {education[0].gpa}
+                    <p className="text-muted-foreground text-sm">
+                      {edu.description ||
+                        "Focused on academic and practical training in technology, systems, and software development."}
+                    </p>
+                    {edu.gpa && (
+                      <p className="text-sm text-muted-foreground mt-2">
+                        GPA: {edu.gpa}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <Card>
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    Education details not available
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Please update your education entries in the admin panel so
+                    this section can show the correct academic background.
                   </p>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
-            {/* Certifications */}
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center mb-4">
